@@ -1,0 +1,31 @@
+{
+  "name": "awaseru-final",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@types/node": "22.13.11",
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4",
+    "axios": "^1.8.4",
+    "dayjs": "^1.11.13",
+    "eslint": "9.23.0",
+    "eslint-config-next": "15.2.3",
+    "lucide-react": "^0.483.0",
+    "next": "15.2.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "tailwind-merge": "^3.0.2",
+    "typescript": "5.8.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.3.0"
+  }
+}

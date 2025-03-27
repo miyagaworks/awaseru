@@ -1,0 +1,20 @@
+# 依存関係
+node_modules/
+.pnp
+.pnp.js
+
+# ビルド成果物
+.next/
+out/
+build/
+dist/
+
+# 大きなファイル
+*.tar.gz
+*.node
+
+# その他
+.DS_Store
+*.log
+.env*
+!.env.example

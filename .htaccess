@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Next.jsアプリケーション用のリバースプロキシ設定
+    RewriteRule ^app/(.*)$ http://127.0.0.1:32769/app/$1 [P,L]
+</IfModule>
+
+<IfModule mod_proxy.c>
+    ProxyPreserveHost On
+    ProxyRequests Off
+</IfModule>
