@@ -8,7 +8,7 @@ import { LoadingOverlay } from '../ui/LoadingOverlay';
 import { useErrorHandler } from '../../lib/hooks/useErrorHandler';
 import type { Event, EventData, FormattedResponses, ResponseStatus } from '../../types/database';
 import { useRouter } from 'next/navigation';
-import { eventOperations } from "../../lib/supabase";
+import { eventOperations } from "../../lib/api";
 import usePolling from '../../lib/hooks/usePolling'; // ポーリングフック追加
 
 interface ResultsContainerProps {

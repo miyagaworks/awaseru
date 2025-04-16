@@ -64,6 +64,7 @@ export const eventOperations = {
     participants: string[];
   }) {
     try {
+      // 明示的にフィールド名を指定して insert を実行
       const { data: event, error } = await supabase
         .from("events")
         .insert({
@@ -72,10 +73,16 @@ export const eventOperations = {
           dates: data.dates,
           participants: data.participants,
         })
-        .select()
+        .select(
+          "id, description, dates, participants, created_at, expires_at, title"
+        )
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Insert error:", error);
+        throw error;
+      }
+
       if (!event) {
         throw new Error("イベントの作成に失敗しました");
       }
