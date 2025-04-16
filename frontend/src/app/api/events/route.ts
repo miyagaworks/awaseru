@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log("Creating event with data:", body);
 
     const { data, error } = await supabase
       .from("events")
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    console.log("Event created:", data);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error in POST /events:", error);

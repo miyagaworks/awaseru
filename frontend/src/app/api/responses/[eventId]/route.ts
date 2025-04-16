@@ -4,10 +4,10 @@ import { supabase } from "@/lib/supabase";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  context: { params: { eventId: string } }
 ) {
   try {
-    const eventId = params.eventId;
+    const eventId = context.params.eventId;
 
     const { data, error } = await supabase
       .from("responses")
@@ -31,10 +31,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  context: { params: { eventId: string } }
 ) {
   try {
-    const eventId = params.eventId;
+    const eventId = context.params.eventId;
     const body = await request.json();
 
     const { data, error } = await supabase
