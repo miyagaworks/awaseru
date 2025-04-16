@@ -8,7 +8,7 @@ import { LoadingOverlay } from '../ui/LoadingOverlay';
 import { useErrorHandler } from '../../lib/hooks/useErrorHandler';
 import type { Event, EventData, FormattedResponses, ResponseStatus } from '../../types/database';
 import { useRouter } from 'next/navigation';
-import { eventOperations } from '../../lib/api'; // Supabaseから代替APIに変更
+import { eventOperations } from "../../lib/supabase";
 import usePolling from '../../lib/hooks/usePolling'; // ポーリングフック追加
 
 interface ResultsContainerProps {
@@ -28,13 +28,16 @@ const useResponses = (eventId: string, initialResponses: FormattedResponses) => 
   // ポーリング用のデータフェッチコールバック
   const fetchResponses = useCallback(async (): Promise<FormattedResponses> => {
     try {
-      const data = await eventOperations.getResponses(eventId);
-      // 型を明示的に変換
-      const formattedResponses = data as FormattedResponses;
+      // レスポンスデータを取得（配列形式）
+      const responsesData = await eventOperations.getResponses(eventId);
+
+      // 配列からFormattedResponses形式に変換
+      const formattedResponses = eventOperations.formatResponses(responsesData);
+
       setResponses(formattedResponses);
       return formattedResponses;
     } catch (err) {
-      console.error('Error fetching responses:', err);
+      console.error("Error fetching responses:", err);
       handleError(err);
       throw err;
     }
