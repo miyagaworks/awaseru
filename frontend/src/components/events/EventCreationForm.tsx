@@ -5,7 +5,7 @@ import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { LoadingOverlay } from '../../components/ui/LoadingOverlay';
 import { ArrowUp, ArrowDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { eventOperations } from '../../lib/api';
+import { eventOperations } from "../../lib/supabase";
 
 interface DateItem {
   date: string;

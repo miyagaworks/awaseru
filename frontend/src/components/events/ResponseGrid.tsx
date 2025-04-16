@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { eventOperations } from '../../lib/api';
+import { eventOperations } from "../../lib/supabase";
 import type { ResponseStatus, FormattedResponses } from '../../types/database';
 import { ErrorHandler } from '../../lib/errors/errorHandler';
 import type { ErrorState } from '../../lib/errors/types';
