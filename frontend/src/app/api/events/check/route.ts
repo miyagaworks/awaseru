@@ -1,4 +1,4 @@
-// app/api/events/check/route.ts
+// src/app/api/events/check/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
 
     if (!eventId) {
       return NextResponse.json(
-        { error: "イベントIDが指定されていません" },
+        { error: "Event ID is required" },
         { status: 400 }
       );
     }
@@ -21,15 +21,21 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error checking event existence:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return NextResponse.json(
+        { error: "イベントの確認に失敗しました" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ exists: !!data });
   } catch (error) {
-    console.error("Error in GET /events/check:", error);
+    console.error("Error in check event:", error);
     return NextResponse.json(
       { error: "イベントの確認に失敗しました" },
       { status: 500 }
     );
   }
 }
+
+// 動的ルートであることを明示
+export const dynamic = "force-dynamic";
