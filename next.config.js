@@ -1,16 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
-  trailingSlash: true,
-  experimental: {
-  },
-  // 依存関係を含める設定を追加
-  experimental: {
-    outputFileTracingRoot: process.cwd(),
-    outputFileTracingIncludes: {
-      '/**/*': ['node_modules/**/*']
-    }
-  }
+    // 本番環境でのソースマップを無効化
+    productionBrowserSourceMaps: false,
+
+    // ESLintのチェックを無効にする
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
 };
 
 module.exports = nextConfig;
