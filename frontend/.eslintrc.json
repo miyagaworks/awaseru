@@ -1,7 +1,13 @@
 {
   "extends": ["next/core-web-vitals"],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
   "rules": {
-    // 必要に応じてカスタムルールを追加できます
     "react/no-unescaped-entities": "off",
     "react/display-name": "off"
   }
