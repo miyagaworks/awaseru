@@ -56,9 +56,10 @@ const useResponses = (
 
   // ポーリング設定
   const { loading } = usePolling(fetchResponses, {
-    interval: 10000, // 10秒間隔
-    enabled: true,
+    interval: 30000, // 10秒から30秒に変更
+    enabled: true, // 完全に無効にする場合はfalseに設定
     initialData: initialResponses,
+    showLoading: false, // ローディング表示を無効化（このプロパティがなければ追加）
   });
 
   // レスポンス更新処理
