@@ -217,7 +217,7 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
             </h2>
             <Input
               type="text"
-              placeholder="〇〇〇の日程調整をお願いします。"
+              placeholder="〇〇〇の日程調整"
               value={formData.message}
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
               className="bg-white"

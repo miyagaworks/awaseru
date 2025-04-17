@@ -171,7 +171,7 @@ export default function CreatePage() {
         </h2>
         <Input
           type="text"
-          placeholder="〇〇〇の日程調整をお願いします。"
+          placeholder="〇〇〇の日程調整"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="bg-white"
