@@ -5,7 +5,11 @@ const nextConfig = {
     productionBrowserSourceMaps: false, // 本番環境でのソースマップを無効化
     // キャッシュの設定
     staticPageGenerationTimeout: 90,
-    // その他の設定...
-}
+    output: "standalone",
+    experimental: {
+        appDir: true,
+        serverActions: true,
+    },
+};
 
 module.exports = nextConfig
