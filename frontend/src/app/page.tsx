@@ -62,20 +62,6 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div
             className="card p-6 space-y-4 card-hover animate-fade-in"
-            style={{ animationDelay: "0.1s" }}
-          >
-            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-              <Calendar className="h-8 w-8 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-bold text-center text-gray-800">
-              日程を選択
-            </h3>
-            <p className="text-gray-600 text-center">
-              調整したい日程をカレンダーから選びます
-            </p>
-          </div>
-          <div
-            className="card p-6 space-y-4 card-hover animate-fade-in"
             style={{ animationDelay: "0.2s" }}
           >
             <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
@@ -86,6 +72,20 @@ export default function HomePage() {
             </h3>
             <p className="text-gray-600 text-center">
               参加者の名前を入力して追加します
+            </p>
+          </div>
+          <div
+            className="card p-6 space-y-4 card-hover animate-fade-in"
+            style={{ animationDelay: "0.1s" }}
+          >
+            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+              <Calendar className="h-8 w-8 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-bold text-center text-gray-800">
+              日程を選択
+            </h3>
+            <p className="text-gray-600 text-center">
+              調整したい日程をカレンダーから選びます
             </p>
           </div>
           <div
