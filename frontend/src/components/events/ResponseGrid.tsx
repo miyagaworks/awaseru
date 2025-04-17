@@ -396,192 +396,196 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
         />
       )}
 
-      <div className="relative overflow-x-auto rounded-lg bg-white">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr>
-              <th className="w-[180px] min-w-[110px] sticky left-0 z-20 h-[50px] bg-[#d9d9d9] border-r border-b border-[#939393] text-center text-sm">
-                参加者
-              </th>
-              {dates.map((date, index) => {
-                const { text, color } = formatDate(date);
+      <div className="rounded-2xl border-4 border-blue-200">
+        <div className="relative overflow-x-auto rounded-xl bg-white border-4 border-white">
+          <table className="w-full border-collapse ">
+            <thead>
+              <tr>
+                <th className="w-[180px] min-w-[110px] sticky left-0 z-20 h-[50px] bg-[#d9d9d9] border-r border-b border-[#939393] text-center text-sm">
+                  参加者
+                </th>
+                {dates.map((date, index) => {
+                  const { text, color } = formatDate(date);
+                  return (
+                    <th
+                      key={date}
+                      className={`w-[110px] min-w-[110px] h-[50px] ${
+                        index < dates.length - 1 ? "border-r" : ""
+                      } border-b border-[#939393] bg-[#d9d9d9] p-4 ${color} text-center text-sm`}
+                    >
+                      {text}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {participants.map((participant, pIndex) => {
+                const participantName = normalizeParticipantName(participant);
+
                 return (
-                  <th
-                    key={date}
-                    className={`w-[110px] min-w-[110px] h-[50px] ${
-                      index < dates.length - 1 ? "border-r" : ""
-                    } border-b border-[#939393] bg-[#d9d9d9] p-4 ${color} text-center text-sm`}
-                  >
-                    {text}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {participants.map((participant, pIndex) => {
-              const participantName = normalizeParticipantName(participant);
+                  <tr key={participantName}>
+                    <td
+                      className={`sticky left-0 z-20 w-[90px] min-w-[90px] h-[50px] border-r ${
+                        pIndex !== participants.length - 1 ? "border-b" : ""
+                      } border-[#939393] bg-white text-center text-sm`}
+                    >
+                      {normalizeParticipantName(participant)}
+                    </td>
+                    {dates.map((date, dIndex) => {
+                      const cellId = `${participantName}-${date}`;
+                      const status =
+                        localResponses[participantName]?.[date] || "未回答";
+                      const { bg, icon } = getResponseStyle(status);
+                      const isLastRow = pIndex === participants.length - 1;
+                      const isUpdating = updating === cellId;
 
-              return (
-                <tr key={participantName}>
-                  <td
-                    className={`sticky left-0 z-20 w-[90px] min-w-[90px] h-[50px] border-r ${
-                      pIndex !== participants.length - 1 ? "border-b" : ""
-                    } border-[#939393] bg-white text-center text-sm`}
-                  >
-                    {normalizeParticipantName(participant)}
-                  </td>
-                  {dates.map((date, dIndex) => {
-                    const cellId = `${participantName}-${date}`;
-                    const status =
-                      localResponses[participantName]?.[date] || "未回答";
-                    const { bg, icon } = getResponseStyle(status);
-                    const isLastRow = pIndex === participants.length - 1;
-                    const isUpdating = updating === cellId;
-
-                    return (
-                      <td
-                        key={cellId}
-                        className={`relative w-[110px] min-w-[110px] h-[50px] 
+                      return (
+                        <td
+                          key={cellId}
+                          className={`relative w-[110px] min-w-[110px] h-[50px] 
                           ${dIndex < dates.length - 1 ? "border-r" : ""} 
                           ${!isLastRow ? "border-b" : ""} 
                           border-[#939393] ${bg} p-[6px]`}
-                      >
-                        <button
-                          data-cell-id={cellId}
-                          className={`response-button w-full h-full flex items-center justify-center gap-2 
+                        >
+                          <button
+                            data-cell-id={cellId}
+                            className={`response-button w-full h-full flex items-center justify-center gap-2 
                             border border-[#939393] rounded-lg 
                             hover:bg-opacity-90 transition-colors text-sm`}
-                          onClick={() => handleDropdownToggle(cellId)}
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            {icon ? (
-                              <div className="flex items-center justify-center">
-                                <Image
-                                  src={icon}
-                                  alt={status}
-                                  width={18}
-                                  height={18}
-                                />
-                              </div>
-                            ) : (
-                              <span className="text-[#c4c4c4]">未回答</span>
-                            )}
-                            {!readonly && (
-                              <svg
-                                className="w-4 h-4 text-[#939393]"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 9l-7 7-7-7"
-                                />
-                              </svg>
-                            )}
-                          </div>
-                        </button>
-
-                        {activeDropdown === cellId && (
-                          <div
-                            ref={dropdownRef}
-                            className="absolute z-[9999] w-[98px] bg-white border border-[#939393] rounded-lg shadow-lg overflow-hidden"
-                            style={{
-                              position: "fixed",
-                              left: (() => {
-                                const button = document.querySelector(
-                                  `[data-cell-id="${cellId}"]`
-                                );
-                                if (button) {
-                                  const rect = button.getBoundingClientRect();
-                                  return `${rect.left + rect.width / 2}px`;
-                                }
-                                return "50%";
-                              })(),
-                              top: (() => {
-                                const button = document.querySelector(
-                                  `[data-cell-id="${cellId}"]`
-                                );
-                                if (button) {
-                                  const rect = button.getBoundingClientRect();
-                                  return `${rect.bottom + 4}px`;
-                                }
-                                return "100%";
-                              })(),
-                              transform: "translateX(-50%)",
-                            }}
+                            onClick={() => handleDropdownToggle(cellId)}
                           >
-                            {responseOptions.map((option) => {
-                              const { icon } = getResponseStyle(option);
-                              return (
-                                <button
-                                  key={option}
-                                  className={`w-full px-2 py-2 flex items-center justify-center gap-1.5 hover:bg-gray-100 ${
-                                    status === option ? "bg-gray-100" : ""
-                                  }`}
-                                  onClick={() =>
-                                    handleResponseChange(
-                                      participantName,
-                                      date,
-                                      option
-                                    )
-                                  }
-                                  disabled={isUpdating}
+                            <div className="flex items-center justify-center gap-2">
+                              {icon ? (
+                                <div className="flex items-center justify-center">
+                                  <Image
+                                    src={icon}
+                                    alt={status}
+                                    width={18}
+                                    height={18}
+                                  />
+                                </div>
+                              ) : (
+                                <span className="text-[#c4c4c4]">未回答</span>
+                              )}
+                              {!readonly && (
+                                <svg
+                                  className="w-4 h-4 text-[#939393]"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
                                 >
-                                  {icon ? (
-                                    <div className="flex items-center justify-center w-5 h-5">
-                                      <Image
-                                        src={icon}
-                                        alt={option}
-                                        width={18}
-                                        height={18}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <span className="text-[#c4c4c4]">
-                                      未回答
-                                    </span>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 9l-7 7-7-7"
+                                  />
+                                </svg>
+                              )}
+                            </div>
+                          </button>
+
+                          {activeDropdown === cellId && (
+                            <div
+                              ref={dropdownRef}
+                              className="absolute z-[9999] w-[98px] bg-white border border-[#939393] rounded-lg shadow-lg overflow-hidden"
+                              style={{
+                                position: "fixed",
+                                left: (() => {
+                                  const button = document.querySelector(
+                                    `[data-cell-id="${cellId}"]`
+                                  );
+                                  if (button) {
+                                    const rect = button.getBoundingClientRect();
+                                    return `${rect.left + rect.width / 2}px`;
+                                  }
+                                  return "50%";
+                                })(),
+                                top: (() => {
+                                  const button = document.querySelector(
+                                    `[data-cell-id="${cellId}"]`
+                                  );
+                                  if (button) {
+                                    const rect = button.getBoundingClientRect();
+                                    return `${rect.bottom + 4}px`;
+                                  }
+                                  return "100%";
+                                })(),
+                                transform: "translateX(-50%)",
+                              }}
+                            >
+                              {responseOptions.map((option) => {
+                                const { icon } = getResponseStyle(option);
+                                return (
+                                  <button
+                                    key={option}
+                                    className={`w-full px-2 py-2 flex items-center justify-center gap-1.5 hover:bg-gray-100 ${
+                                      status === option ? "bg-gray-100" : ""
+                                    }`}
+                                    onClick={() =>
+                                      handleResponseChange(
+                                        participantName,
+                                        date,
+                                        option
+                                      )
+                                    }
+                                    disabled={isUpdating}
+                                  >
+                                    {icon ? (
+                                      <div className="flex items-center justify-center w-5 h-5">
+                                        <Image
+                                          src={icon}
+                                          alt={option}
+                                          width={18}
+                                          height={18}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <span className="text-[#c4c4c4]">
+                                        未回答
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="mt-6 space-y-3">
-        <div className="bg-white rounded-lg p-4">
-          <h3 className="text-xl font-medium mb-4">おすすめ日程</h3>
+      <div className="mt-4 space-y-2">
+        <div className="bg-white rounded-lg p-3 border border-gray-100">
+          <h3 className="text-base font-medium mb-2 text-gray-700">
+            おすすめ日程
+          </h3>
 
           {bestDates.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-1 text-sm">
               {bestDates.map((date) => (
                 <div
                   key={date.date}
-                  className="bg-[#dcfce7] rounded-lg border border-[#279600] p-4"
+                  className="bg-[#f0fdf4] rounded-md border border-[#86efac] p-2"
                 >
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-1">
                       <Image
                         src="/icons/maru.svg"
                         alt="◯"
-                        width={16}
-                        height={16}
+                        width={12}
+                        height={12}
                       />
                       <span>{date.formattedDate}</span>
                     </div>
-                    <div className="text-[#279600]">
+                    <div className="text-[#279600] text-xs">
                       {date.okCount}人参加可能（{date.percentage}%）
                     </div>
                   </div>
@@ -590,23 +594,25 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
             </div>
           )}
 
-          <div className="space-y-2 mt-2">
-            {otherDates.map((date) => (
-              <div
-                key={date.date}
-                className="bg-[#ececec] rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
-              >
-                <span className="text-gray-600">{date.formattedDate}</span>
-                {date.noResponseCount === participants.length ? (
-                  <span className="text-gray-500">未回答</span>
-                ) : (
-                  <span className="text-gray-600">
-                    {date.okCount}人参加可能（{date.percentage}%）
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+          {otherDates.length > 0 && (
+            <div className="space-y-1 text-xs mt-1">
+              {otherDates.map((date) => (
+                <div
+                  key={date.date}
+                  className="bg-[#f9f9f9] rounded-md p-2 flex justify-between items-center"
+                >
+                  <span className="text-gray-600">{date.formattedDate}</span>
+                  {date.noResponseCount === participants.length ? (
+                    <span className="text-gray-500">未回答</span>
+                  ) : (
+                    <span className="text-gray-600">
+                      {date.okCount}人参加可能（{date.percentage}%）
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
