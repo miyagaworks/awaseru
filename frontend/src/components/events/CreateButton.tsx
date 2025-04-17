@@ -19,7 +19,7 @@ export const CreateButton = ({
       <button
         onClick={onClick}
         disabled={disabled}
-        className="w-full flex items-center justify-center bg-blue-500 text-white py-5 rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+        className="w-full flex items-center justify-center bg-blue-600 text-white py-5 rounded-lg shadow-md hover:bg-blue-800 transition-colors disabled:bg-gray-400"
       >
         <Image
           src="/icons/calendar.svg"

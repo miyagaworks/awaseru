@@ -525,7 +525,7 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
 
       <button
         onClick={handleShare}
-        className="fixed left-0 bottom-10 z-50 flex items-center justify-center bg-blue-500 p-3 rounded-r-lg shadow-md hover:bg-blue-600 transition-colors"
+        className="fixed left-0 bottom-10 z-50 flex items-center justify-center bg-blue-600 p-3 rounded-r-lg shadow-md hover:bg-blue-800 transition-colors"
       >
         <Image
           src="/icons/share.svg"

@@ -2,46 +2,181 @@
 @tailwind components;
 @tailwind utilities;
 :root {
-    --background: #ffffff;
+    --background: #f8f9fa;
     --foreground: #171717;
+    --primary: #3b82f6;
+    --primary-hover:#2563eb;
+    --secondary: #e5e7eb;
+    --accent: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --card: #ffffff;
+    --card-foreground: #171717;
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: rgba(59, 130, 246, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
      :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-:root {
-    --background: #ffffff;
-    --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-     :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
+        --background: #0f172a;
+        --foreground: #f8f9fa;
+        --primary: #3b82f6;
+        --primary-hover:#60a5fa;
+        --secondary: #1f2937;
+        --accent: #a78bfa;
+        --success: #34d399;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --card: #1e293b;
+        --card-foreground: #f8f9fa;
+        --border: #334155;
+        --input: #334155;
+        --ring: rgba(59, 130, 246, 0.5);
     }
 }
 
 body {
     color: var(--foreground);
     background: var(--background);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
 }
 
 
-/* 以下を追加 */
+/* アニメーション */
 
-input[type="text"],
-input[type="email"],
-input[type="number"] {
-    font-size: 16px;
-    -webkit-text-size-adjust: 100%;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+/* トランジションとアニメーションの追加 */
+.transition-base {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.hover-lift {
+  @apply hover:-translate-y-1 hover:shadow-lg;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* カスタムユーティリティクラス */
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+}
+
+.animate-pulse-blue {
+    animation: pulse 2s infinite;
+}
+
+
+/* モバイルでのタップターゲットサイズを確保 */
+
+button,
+input,
+select,
+a {
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+
+/* スタイリッシュなカード */
+
+.card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md;
+}
+
+.card-hover {
+    @apply hover:-translate-y-1 hover:shadow-lg;
+}
+
+
+/* スタイリッシュなボタン */
+
+.btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+}
+
+.btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500;
+}
+
+.btn-accent {
+    @apply bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500;
+}
+
+.btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+}
+
+.btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+
+/* スタイリッシュな入力フィールド */
+
+.input {
+    @apply w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
 }
 
 
@@ -51,9 +186,6 @@ input[type="number"] {
     color: #a0a0a0 !important;
     opacity: 1;
 }
-
-
-/* 各ブラウザに対応するための設定 */
 
 ::-webkit-input-placeholder {
     color: #a0a0a0 !important;
@@ -72,11 +204,338 @@ input[type="number"] {
 }
 
 
-/* モバイルでのタップターゲットサイズを確保 */
+/* ガラスモーフィズム効果 */
 
-button,
-input,
-select {
-    min-height: 44px;
-    touch-action: manipulation;
+.glassmorphism {
+    @apply backdrop-blur-md bg-white/70 border border-white/20 shadow-lg;
+}
+
+
+/* グラデーションテキスト */
+
+.gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600;
+}
+
+
+/* グラデーションボタン */
+
+.gradient-btn {
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white;
+}
+
+
+/* グラデーションボーダー */
+
+.gradient-border {
+    @apply relative before:absolute before:inset-0 before:p-[1px] before:rounded-lg before:bg-gradient-to-r before:from-blue-500 before:to-purple-500 before:-z-10;
+}
+
+
+/* ナビゲーションリンク */
+
+.nav-link {
+    @apply text-gray-700 hover:text-blue-600 transition-colors;
+}
+
+.nav-link-active {
+    @apply text-blue-600 font-medium;
+}
+
+
+/* テーブルスタイル */
+
+.table-modern {
+    @apply w-full bg-white rounded-lg overflow-hidden shadow-sm;
+}
+
+.table-modern th {
+    @apply bg-gray-50 text-left text-gray-600 font-medium px-6 py-3 text-sm;
+}
+
+.table-modern td {
+    @apply px-6 py-4 border-t border-gray-100;
+}
+
+.table-modern tr:hover {
+    @apply bg-gray-50 transition-colors;
+}
+
+
+/* コンテナ */
+
+.container-content {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+
+/* ヘッダー */
+
+.header-modern {
+    @apply sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-200 shadow-sm;
+}
+
+
+/* フッター */
+
+.footer-modern {
+    @apply bg-gray-50 border-t border-gray-200 py-8;
+}
+
+
+/* パンくずリスト */
+
+.breadcrumbs {
+    @apply flex items-center space-x-2 text-sm text-gray-600;
+}
+
+.breadcrumb-item {
+    @apply hover:text-blue-600 transition-colors;
+}
+
+.breadcrumb-separator {
+    @apply text-gray-400;
+}
+
+
+/* バッジ */
+
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-blue {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.badge-green {
+    @apply bg-green-100 text-green-800;
+}
+
+.badge-yellow {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-red {
+    @apply bg-red-100 text-red-800;
+}
+
+.badge-purple {
+    @apply bg-purple-100 text-purple-800;
+}
+
+
+/* ツールチップ */
+
+.tooltip {
+    @apply relative;
+}
+
+.tooltip-text {
+    @apply absolute z-10 w-max p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg opacity-0 invisible transition-opacity;
+}
+
+.tooltip:hover .tooltip-text {
+    @apply opacity-100 visible;
+}
+
+
+/* スケルトンローディング */
+
+.skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+}
+
+
+/* スクロールバースタイル */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
+}
+
+/* トップページ */
+.hero-gradient {
+  @apply bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800;
+}
+
+.feature-card {
+  @apply bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg hover:-translate-y-1;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-700 transition-all transform hover:-translate-y-1 hover:shadow-lg flex items-center gap-2;
+}
+
+/* ステータス表示用のスタイル */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.status-ok {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-ng {
+  @apply bg-red-100 text-red-800;
+}
+
+.status-maybe {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-pending {
+  @apply bg-gray-100 text-gray-800;
+}
+
+/* 日程カードのスタイル */
+.date-card {
+  @apply rounded-xl border bg-gradient-to-br p-4 shadow-sm hover:shadow-md transition-shadow;
+}
+
+.date-card-preferred {
+  @apply from-green-50 to-green-100 border-green-200;
+}
+
+.date-card-alternate {
+  @apply from-blue-50 to-blue-100 border-blue-200;
+}
+
+.date-card-low {
+  @apply from-yellow-50 to-yellow-100 border-yellow-200;
+}
+
+.date-card-unavailable {
+  @apply from-gray-50 to-gray-100 border-gray-200;
+}
+
+/* フォーム要素のスタイル */
+.input-group {
+  @apply space-y-1;
+}
+
+.input-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.input-field {
+  @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+}
+
+/* カレンダー日付セル用のスタイル */
+.calendar-day {
+  @apply relative w-full p-2 text-center transition-colors;
+}
+
+.calendar-day-selected {
+  @apply bg-blue-100 hover:bg-blue-200;
+}
+
+.calendar-day-today {
+  @apply font-bold;
+}
+
+.calendar-day-past {
+  @apply text-gray-300 cursor-not-allowed;
+}
+
+/* モバイル対応の改善 */
+.mobile-container {
+  @apply px-4 sm:px-6 lg:px-8;
+}
+
+.grid-responsive {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+}
+
+/* ナビゲーションのスタイル */
+.nav-link {
+  @apply inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors gap-1;
+}
+
+.nav-link-active {
+  @apply font-medium text-blue-700;
+}
+
+/* フェードイン用アニメーション */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* カレンダー選択日のスタイル強化 */
+.calendar-day-selected {
+  @apply relative bg-blue-100;
+}
+
+.calendar-day-selected::after {
+  content: '';
+  @apply absolute inset-0 border-2 border-blue-500 rounded-md pointer-events-none;
+}
+
+/* 入力フィールドのフォーカス改善 */
+.input-focus {
+  @apply focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+/* ボタンスタイルの改善 */
+.btn-blue {
+  @apply bg-blue-600 hover:bg-blue-700 text-white transition-all transform hover:-translate-y-0.5 hover:shadow-md;
+}
+
+/* グローバルなアニメーション */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* 編集ページ専用のスタイル */
+.calendar-day-selected {
+  @apply bg-blue-100 rounded-md;
+}
+
+.calendar-day-selected::after {
+  content: '';
+  @apply absolute inset-0 border-2 border-blue-500 rounded-md pointer-events-none;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.input-group {
+  @apply space-y-1;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg transition-colors;
 }
