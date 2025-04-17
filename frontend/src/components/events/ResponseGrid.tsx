@@ -148,8 +148,6 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
     status: ResponseStatus
   ) => {
     const cellId = `${participant}-${date}`;
-    // ローディング状態を設定する行をコメントアウトまたは削除
-    // setUpdating(cellId);
     setError(null);
 
     try {
@@ -412,7 +410,7 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                             border border-[#939393] rounded-lg 
                             hover:bg-opacity-90 transition-colors text-sm`}
                           onClick={() => handleDropdownToggle(cellId)}
-                          disabled={readonly}
+                          disabled={readonly} // ここから isUpdating に関する条件を削除
                         >
                           <div className="flex items-center justify-center gap-2">
                             {icon ? (
