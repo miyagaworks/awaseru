@@ -1,37 +1,82 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --background: #ffffff;
+    --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+     :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+     :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+    color: var(--foreground);
+    background: var(--background);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
+
 /* 以下を追加 */
+
 input[type="text"],
 input[type="email"],
 input[type="number"] {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
 }
 
+
+/* プレースホルダーテキストの色を薄いグレーに設定 */
+
+::placeholder {
+    color: #a0a0a0 !important;
+    opacity: 1;
+}
+
+
+/* 各ブラウザに対応するための設定 */
+
+::-webkit-input-placeholder {
+    color: #a0a0a0 !important;
+}
+
+::-moz-placeholder {
+    color: #a0a0a0 !important;
+}
+
+:-ms-input-placeholder {
+    color: #a0a0a0 !important;
+}
+
+:-moz-placeholder {
+    color: #a0a0a0 !important;
+}
+
+
 /* モバイルでのタップターゲットサイズを確保 */
-button, 
-input, 
+
+button,
+input,
 select {
-  min-height: 44px;
-  touch-action: manipulation;
+    min-height: 44px;
+    touch-action: manipulation;
 }
