@@ -337,7 +337,7 @@ export const EventEditor = ({
       {participants.length > 0 && (
         <div className="flex justify-between items-center text-sm text-gray-500 px-2">
           <span>現在の参加者数: {participants.length}名</span>
-          <span>残り: {20 - participants.length}名まで追加可能</span>
+          <span>残り: {10 - participants.length}名まで追加可能</span>
         </div>
       )}
     </div>

@@ -148,7 +148,7 @@ export const DateSummary: React.FC<DateSummaryProps> = ({
 
       <div className="mt-3 pt-3 border-t border-gray-200">
         <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-500">OK率</span>
+          <span className="text-gray-500">回答率</span>
           <span className="font-medium">
             {participants.length > 0
               ? Math.round((summary["◯"] / participants.length) * 100)
