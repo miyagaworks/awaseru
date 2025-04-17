@@ -410,7 +410,6 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                             border border-[#939393] rounded-lg 
                             hover:bg-opacity-90 transition-colors text-sm`}
                           onClick={() => handleDropdownToggle(cellId)}
-                          disabled={readonly} // ここから isUpdating に関する条件を削除
                         >
                           <div className="flex items-center justify-center gap-2">
                             {icon ? (
