@@ -396,8 +396,8 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
         />
       )}
 
-      <div className="rounded-2xl border-4 border-blue-200">
-        <div className="relative overflow-x-auto rounded-xl bg-white border-4 border-white">
+      <div className="rounded-2xl border-4 border-blue-400">
+        <div className="relative overflow-x-auto rounded-xl bg-white border-8 border-white">
           <table className="w-full border-collapse ">
             <thead>
               <tr>

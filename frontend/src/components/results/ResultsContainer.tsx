@@ -278,32 +278,30 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
         </div>
       )}
 
-      {/* メインコンテンツ */}
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-        <div
-          className="overflow-x-auto"
-          role="region"
-          aria-label="回答グリッド"
-          data-testid="response-grid-container"
-        >
-          <div className="min-w-full">
-            <ResponseGrid
-              eventId={eventId}
-              dates={eventData.dates}
-              participants={normalizedParticipants}
-              responses={responses}
-              readonly={false}
-              onResponseUpdate={updateResponse}
-            />
-          </div>
+      {/* 回答グリッド部分 - カードの外に出す */}
+      <div
+        className="overflow-x-auto shadow-sm rounded-xl"
+        role="region"
+        aria-label="回答グリッド"
+        data-testid="response-grid-container"
+      >
+        <div className="min-w-full">
+          <ResponseGrid
+            eventId={eventId}
+            dates={eventData.dates}
+            participants={normalizedParticipants}
+            responses={responses}
+            readonly={false}
+            onResponseUpdate={updateResponse}
+          />
         </div>
       </div>
 
-      {/* 日付ごとの集計 */}
+      {/* 日付ごとの集計 - カードで囲む */}
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <h2 className="text-xl font-bold mb-4 text-gray-800">日付ごとの集計</h2>
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 shadow-sm rounded-xl p-2"
           role="region"
           aria-label="日付ごとの集計"
           data-testid="date-summaries"
