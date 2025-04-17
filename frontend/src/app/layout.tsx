@@ -31,6 +31,12 @@ export const metadata: Metadata = {
     description: "簡単・スマートな日程調整サービス。登録不要ですぐに使えます。",
     images: ["https://awaseru.vercel.app/images/ogp.jpg"],
   },
+  // LINE専用のメタタグを追加
+  other: {
+    "line:image": "https://awaseru.vercel.app/images/line-ogp.png", // LINE用の画像
+    "line:title": "アワセル - シンプルな日程調整ツール", // LINE用のタイトル
+    "line:description": "簡単・スマートな日程調整サービス", // LINE用の説明
+  },
   icons: {
     icon: "/app/favicon.ico",
     shortcut: "/app/favicon.ico",
