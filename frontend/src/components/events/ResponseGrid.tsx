@@ -39,29 +39,42 @@ const RecommendedDates: React.FC<RecommendedDatesProps> = ({
     return String(participant).replace(/[\[\]\"]/g, '');
   };
 
-  const dateStats = dates.map(date => {
+  const dateStats = dates.map((date) => {
     const okCount = participants.reduce((count, participant) => {
       const participantName = normalizeParticipantName(participant);
-      return count + (responses[participantName]?.[date] === '◯' ? 1 : 0);
+      return count + (responses[participantName]?.[date] === "◯" ? 1 : 0);
+    }, 0);
+
+    // △の数をカウントする処理を追加
+    const maybeCount = participants.reduce((count, participant) => {
+      const participantName = normalizeParticipantName(participant);
+      return count + (responses[participantName]?.[date] === "△" ? 1 : 0);
     }, 0);
 
     const noResponseCount = participants.reduce((count, participant) => {
       const participantName = normalizeParticipantName(participant);
-      return count + (!responses[participantName]?.[date] || responses[participantName]?.[date] === '未回答' ? 1 : 0);
+      return (
+        count +
+        (!responses[participantName]?.[date] ||
+        responses[participantName]?.[date] === "未回答"
+          ? 1
+          : 0)
+      );
     }, 0);
 
     return {
       date,
-      formattedDate: new Date(date).toLocaleDateString('ja-JP', {
-        month: 'numeric',
-        day: 'numeric',
-        weekday: 'short'
+      formattedDate: new Date(date).toLocaleDateString("ja-JP", {
+        month: "numeric",
+        day: "numeric",
+        weekday: "short",
       }),
       okCount,
+      maybeCount, // △のカウントを追加
       noResponseCount,
-      percentage: Math.round((okCount / participants.length) * 100)
+      percentage: Math.round((okCount / participants.length) * 100),
     };
-  }).sort((a, b) => b.okCount - a.okCount || a.date.localeCompare(b.date));
+  });
 
   const maxOkCount = dateStats.filter(stat => stat.okCount > 0)[0]?.okCount || 0;
   const bestDates = dateStats.filter(stat => stat.okCount === maxOkCount && maxOkCount > 0);
@@ -294,6 +307,14 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
         );
       }, 0);
 
+      // △の数を計算
+      const maybeCount = participants.reduce((count, participant) => {
+        const participantName = normalizeParticipantName(participant);
+        return (
+          count + (localResponses[participantName]?.[date] === "△" ? 1 : 0)
+        );
+      }, 0);
+
       const noResponseCount = participants.reduce((count, participant) => {
         const participantName = normalizeParticipantName(participant);
         return (
@@ -313,11 +334,33 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
           weekday: "short",
         }),
         okCount,
+        maybeCount, // △のカウント
         noResponseCount,
         percentage: Math.round((okCount / participants.length) * 100),
       };
     })
-    .sort((a, b) => b.okCount - a.okCount || a.date.localeCompare(b.date));
+    .sort((a, b) => {
+      // ◯の数が異なる場合
+      if (a.okCount !== b.okCount) {
+        return b.okCount - a.okCount;
+      }
+
+      // △の数を取得（キーが存在しない場合は0とする）
+      const aMaybeCount = Object.prototype.hasOwnProperty.call(a, "maybeCount")
+        ? a.maybeCount
+        : 0;
+      const bMaybeCount = Object.prototype.hasOwnProperty.call(b, "maybeCount")
+        ? b.maybeCount
+        : 0;
+
+      // △の数が異なる場合
+      if (aMaybeCount !== bMaybeCount) {
+        return bMaybeCount - aMaybeCount;
+      }
+
+      // どちらも同じなら日付順
+      return a.date.localeCompare(b.date);
+    });
 
   const maxOkCount =
     dateStats.filter((stat) => stat.okCount > 0)[0]?.okCount || 0;
