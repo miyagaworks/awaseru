@@ -27,19 +27,19 @@ export default function HomePage() {
             ></path>
           </svg>
         </div>
-        <div className="relative z-10 max-w-2xl">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-slide-up">
+        <div className="relative z-10 max-w-2xl w-full flex flex-col items-center md:items-start">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-slide-up text-center md:text-left">
             さ、調整しよ！
           </h1>
           <p
-            className="text-lg md:text-xl text-blue-100 mb-8 animate-slide-up text-justify"
+            className="text-lg md:text-xl text-blue-100 mb-8 animate-slide-up text-center md:text-left w-full"
             style={{ animationDelay: "0.1s" }}
           >
             簡単・スマートな日程調整サービス。 登録不要ですぐに使えます。
           </p>
           <Link
             href="/create"
-            className="inline-flex items-center px-6 py-4 rounded-lg text-lg font-bold bg-white text-blue-600 hover:bg-blue-50 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-slide-up"
+            className="inline-flex items-center px-6 py-4 rounded-lg text-lg font-bold bg-white text-blue-600 hover:bg-blue-50 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-slide-up self-center md:self-start"
             style={{ animationDelay: "0.2s" }}
           >
             <Calendar className="mr-2 h-5 w-5" />
