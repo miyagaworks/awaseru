@@ -1,15 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    poweredByHeader: false, // セキュリティのためX-Powered-Byヘッダーを削除
-    compress: true, // レスポンス圧縮を有効化
-    productionBrowserSourceMaps: false, // 本番環境でのソースマップを無効化
-    // キャッシュの設定
+    poweredByHeader: false,
+    compress: true,
+    productionBrowserSourceMaps: false,
     staticPageGenerationTimeout: 90,
-    output: "standalone",
+    // experimental部分を修正
     experimental: {
-        appDir: true,
+        // appDirを削除
         serverActions: true,
     },
 };
 
-module.exports = nextConfig
+module.exports = nextConfig;

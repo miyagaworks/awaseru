@@ -4,10 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "cd frontend && next build",
-        "build:production": "NODE_ENV=production npm run clean && next build",
-        "build:static": "NODE_ENV=production npm run clean && next build && next export",
+        "build": "next build",
         "start": "next start",
+        "build:static": "NODE_ENV=production npm run clean && next build && next export",
         "clean": "rm -rf .next out && rm -rf node_modules/.cache",
         "lint": "next lint"
     },
@@ -34,6 +33,7 @@
     "dependencies": {
         "@radix-ui/react-dialog": "^1.1.2",
         "@radix-ui/react-slot": "^1.1.0",
+        "@supabase/supabase-js": "^2.49.4",
         "axios": "^1.8.4",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.1",
