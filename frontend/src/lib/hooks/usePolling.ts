@@ -18,6 +18,7 @@ function usePolling<T>(
   fetchFn: () => Promise<T>,
   options: PollingOptions<T>
 ): PollingResult<T> {
+  // デフォルトで false に設定
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<T | null>(options.initialData || null);
   const [error, setError] = useState<Error | null>(null);
@@ -28,7 +29,7 @@ function usePolling<T>(
     const poll = async () => {
       if (!options.enabled) return;
 
-      // showLoadingオプションがfalseの場合はローディング状態を変更しない
+      // showLoading オプションがない場合またはfalseの場合はローディング状態を変更しない
       if (options.showLoading !== false) {
         setLoading(true);
       }
@@ -60,7 +61,12 @@ function usePolling<T>(
     };
   }, [fetchFn, options.enabled, options.interval, options.showLoading]);
 
-  return { loading, data, error };
+  // 強制的にローディングをfalseに設定するオプション
+  return {
+    loading: options.showLoading === false ? false : loading,
+    data,
+    error,
+  };
 }
 
 export default usePolling;
