@@ -23,7 +23,7 @@ export const ShareButton = ({ url }: ShareButtonProps) => {
     <div className="fixed left-4 bottom-4 z-10">
       <button
         onClick={handleShare}
-        className="flex items-center bg-blue-500 text-white py-3 px-4 rounded-r-lg shadow-md hover:bg-blue-600 transition-colors"
+        className="flex items-center bg-blue-600 text-white py-3 px-4 rounded-r-lg shadow-md hover:bg-blue-800 transition-colors"
       >
         <Image
           src="/icons/share.svg"

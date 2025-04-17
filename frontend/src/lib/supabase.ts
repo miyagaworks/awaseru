@@ -64,7 +64,9 @@ export const eventOperations = {
     participants: string[];
   }) {
     try {
-      // 明示的にフィールド名を指定して insert を実行
+      console.log('Supabase createEvent called with data:', data);
+      console.log('Using Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+      
       const { data: event, error } = await supabase
         .from("events")
         .insert({
@@ -73,20 +75,20 @@ export const eventOperations = {
           dates: data.dates,
           participants: data.participants,
         })
-        .select(
-          "id, description, dates, participants, created_at, expires_at, title"
-        )
+        .select()
         .single();
 
       if (error) {
-        console.error("Insert error:", error);
+        console.error('Supabase error:', error);
         throw error;
       }
-
+      
       if (!event) {
+        console.error('No event returned from Supabase');
         throw new Error("イベントの作成に失敗しました");
       }
 
+      console.log('Event created successfully:', event);
       return event;
     } catch (error) {
       console.error("Error in createEvent:", error);

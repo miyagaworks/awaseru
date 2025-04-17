@@ -1,0 +1,15 @@
+{
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.validate": true,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "css.validate": false,
+  "editor.formatOnSave": false,
+  "[css]": {
+    "editor.formatOnSave": false
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}

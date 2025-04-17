@@ -167,30 +167,31 @@ export const EventEditor = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* 日程セクション */}
-      <div className="space-y-4" data-testid="date-section">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5" />
-            日程
-          </h3>
-          <Button 
-            onClick={addDate}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1"
-            disabled={disabled}
-            data-testid="add-date-button"
-          >
-            <Plus className="w-4 h-4" />
-            追加
-          </Button>
-        </div>
-        
-        <div className="space-y-2">
-          {dates.map((date, index) => (
-            <div key={index} className="flex items-center gap-2">
+  <div className="space-y-6 relative">
+    {/* 日程セクション */}
+    <div className="space-y-4" data-testid="date-section">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium flex items-center gap-2 text-gray-800">
+          <CalendarIcon className="w-5 h-5 text-blue-500" />
+          日程
+        </h3>
+        <Button 
+          onClick={addDate}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+          disabled={disabled}
+          data-testid="add-date-button"
+        >
+          <Plus className="w-4 h-4" />
+          追加
+        </Button>
+      </div>
+      
+      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+        {dates.length > 0 ? (
+          dates.map((date, index) => (
+            <div key={index} className="flex items-center gap-2 group">
               <Input
                 type="text"
                 value={new Date(date).toLocaleDateString('ja-JP', {
@@ -200,7 +201,7 @@ export const EventEditor = ({
                   weekday: 'short',
                 })}
                 readOnly
-                className="bg-white"
+                className="bg-white border-gray-200 group-hover:border-blue-200 transition-colors"
                 disabled={disabled}
                 data-testid={`date-input-${index}`}
               />
@@ -209,75 +210,88 @@ export const EventEditor = ({
                 size="sm"
                 onClick={() => removeDate(index)}
                 disabled={disabled}
+                className="text-gray-400 hover:text-red-500 hover:bg-red-50"
                 data-testid={`remove-date-button-${index}`}
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
-          ))}
-          {errors.dates && (
-            <p className="text-sm text-red-500 mt-1" data-testid="date-error">
-              {errors.dates}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* カレンダーダイアログ */}
-      <Dialog open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-        <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-40px)] sm:w-[425px] bg-white rounded-lg p-4">
-          <DialogHeader>
-            <DialogTitle>日程を選択</DialogTitle>
-            <DialogDescription>
-              複数の日程を選択できます。選択が完了したら「完了」をクリックしてください。
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <div className="text-xl font-medium mb-4 text-center">
-              {selectedYear}年{selectedMonth}月
-            </div>
-            <Calendar
-              year={selectedYear}
-              month={selectedMonth}
-              selectedDates={dates}
-              onDateSelect={handleDateSelect}
-              onMonthChange={(year, month) => {
-                setSelectedYear(year);
-                setSelectedMonth(month);
-              }}
-            />
-            <div className="mt-4 flex justify-end">
-              <Button onClick={() => setIsCalendarOpen(false)}>
-                完了
-              </Button>
-            </div>
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+            日程が設定されていません。「追加」ボタンから日程を設定してください。
           </div>
-        </DialogContent>
-      </Dialog>
+        )}
+        {errors.dates && (
+          <p className="text-sm text-red-500 mt-1 flex items-center gap-1.5" data-testid="date-error">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            {errors.dates}
+          </p>
+        )}
+      </div>
+    </div>
 
-      {/* 参加者セクション */}
-      <div className="space-y-4" data-testid="participant-section">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            参加者
-          </h3>
-          <Button 
-            onClick={addParticipant}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1"
-            disabled={disabled || participants.length >= 20}
-            data-testid="add-participant-button"
-          >
-            <Plus className="w-4 h-4" />
-            追加
-          </Button>
+    {/* カレンダーダイアログ */}
+    <Dialog open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+      <DialogContent className="w-[calc(100%-40px)] sm:w-[425px] bg-white rounded-lg p-4 max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-blue-500" />
+            日程を選択
+          </DialogTitle>
+          <DialogDescription>
+            複数の日程を選択できます。選択が完了したら「完了」をクリックしてください。
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mt-4">
+          <div className="text-xl font-medium mb-4 text-center text-gray-800">
+            {selectedYear}年{selectedMonth}月
+          </div>
+          <Calendar
+            year={selectedYear}
+            month={selectedMonth}
+            selectedDates={dates}
+            onDateSelect={handleDateSelect}
+            onMonthChange={(year, month) => {
+              setSelectedYear(year);
+              setSelectedMonth(month);
+            }}
+          />
+          <div className="mt-4 flex justify-end">
+            <Button onClick={() => setIsCalendarOpen(false)} className="bg-blue-600 hover:bg-blue-700 text-white">
+              完了
+            </Button>
+          </div>
         </div>
-        
-        <div className="space-y-2">
-          {participants.map((participant, index) => (
-            <div key={index} className="flex items-center gap-2">
+      </DialogContent>
+    </Dialog>
+
+    {/* 参加者セクション */}
+    <div className="space-y-4 mt-8" data-testid="participant-section">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium flex items-center gap-2 text-gray-800">
+          <Users className="w-5 h-5 text-blue-500" />
+          参加者
+        </h3>
+        <Button 
+          onClick={addParticipant}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+          disabled={disabled || participants.length >= 20}
+          data-testid="add-participant-button"
+        >
+          <Plus className="w-4 h-4" />
+          追加
+        </Button>
+      </div>
+      
+      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+        {participants.length > 0 ? (
+          participants.map((participant, index) => (
+            <div key={index} className="flex items-center gap-2 group">
               <Input
                 type="text"
                 value={participant}
@@ -285,50 +299,84 @@ export const EventEditor = ({
                 placeholder="参加者名"
                 maxLength={20}
                 disabled={disabled}
+                className="bg-white border-gray-200 group-hover:border-blue-200 transition-colors"
                 data-testid={`participant-input-${index}`}
-                ref={index === participants.length - 1 ? newParticipantInputRef : null} // 最後の入力フィールドにrefを設定
+                ref={index === participants.length - 1 ? newParticipantInputRef : null}
               />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => removeParticipant(index)}
                 disabled={disabled}
+                className="text-gray-400 hover:text-red-500 hover:bg-red-50"
                 data-testid={`remove-participant-button-${index}`}
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
-          ))}
-          {errors.participants && (
-            <div 
-              role="alert"
-              data-testid="participant-error"
-              className="text-sm text-red-500 mt-1"
-            >
-              {errors.participants}
-            </div>
-          )}
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+            参加者が設定されていません。「追加」ボタンから参加者を追加してください。
+          </div>
+        )}
+        {errors.participants && (
+          <div 
+            role="alert"
+            data-testid="participant-error"
+            className="text-sm text-red-500 mt-1 flex items-center gap-1.5"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            {errors.participants}
+          </div>
+        )}
+      </div>
+      
+      {participants.length > 0 && (
+        <div className="flex justify-between items-center text-sm text-gray-500 px-2">
+          <span>現在の参加者数: {participants.length}名</span>
+          <span>残り: {20 - participants.length}名まで追加可能</span>
         </div>
-      </div>
-
-      {/* アクションボタン */}
-      <div className="flex justify-end gap-4 pt-4">
-        <Button 
-          variant="outline" 
-          onClick={onCancel}
-          disabled={disabled}
-          data-testid="cancel-button"
-        >
-          キャンセル
-        </Button>
-        <Button 
-          onClick={validateAndSave}
-          disabled={disabled}
-          data-testid="save-button"
-        >
-          {disabled ? '保存中...' : '保存'}
-        </Button>
-      </div>
+      )}
     </div>
-  );
-};
+
+    {/* アクションボタン */}
+    <div className="flex justify-end gap-4 pt-4 mt-8 border-t border-gray-200">
+      <Button 
+        variant="outline" 
+        onClick={onCancel}
+        disabled={disabled}
+        className="border-gray-300 hover:bg-gray-100"
+        data-testid="cancel-button"
+      >
+        キャンセル
+      </Button>
+      <Button 
+        onClick={validateAndSave}
+        disabled={disabled}
+        className="bg-blue-600 hover:bg-blue-700 text-white"
+        data-testid="save-button"
+      >
+        {disabled ? (
+          <span className="flex items-center gap-2">
+            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            保存中...
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+            </svg>
+            保存
+          </span>
+        )}
+      </Button>
+    </div>
+  </div>
+);
+}
