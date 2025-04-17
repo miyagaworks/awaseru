@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Container } from "../components/layout/Container";
 import "./globals.css";
 
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
 };
 
 // 別の変数として定義
-export const viewport: Viewport = {
-  width: 'device-width',
+export const viewport = {
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   minimumScale: 1,
