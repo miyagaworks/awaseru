@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
+        "build": "cd frontend && next build",
         "build:production": "NODE_ENV=production npm run clean && next build",
         "build:static": "NODE_ENV=production npm run clean && next build && next export",
         "start": "next start",
