@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     siteName: "アワセル",
     images: [
       {
-        url: "/ogp.png", // 画像のパスを指定
-        width: 1200,
-        height: 630,
+        url: "https://awaseru.vercel.app/images/ogp.jpg", // 画像のパスを指定
+        width: 1000,
+        height: 525,
         alt: "アワセル - シンプルな日程調整・スケジュール管理ツール",
       },
     ],
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "アワセル - シンプルな日程調整・スケジュール管理ツール",
     description: "簡単・スマートな日程調整サービス。登録不要ですぐに使えます。",
-    images: ["/images/ogp.png"],
+    images: ["https://awaseru.vercel.app/images/ogp.jpg"],
   },
   icons: {
     icon: "/app/favicon.ico",
