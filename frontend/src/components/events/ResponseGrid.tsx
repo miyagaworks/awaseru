@@ -132,13 +132,14 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // state
-  const [localResponses, setLocalResponses] = useState<FormattedResponses>(initialResponses);
+  const [localResponses, setLocalResponses] =
+    useState<FormattedResponses>(initialResponses);
   const [updating, setUpdating] = useState<string | null>(null);
   const [error, setError] = useState<ErrorState | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   // responseOptionsの定義
-  const responseOptions: ResponseStatus[] = ['◯', '×', '△', '未回答'];
+  const responseOptions: ResponseStatus[] = ["◯", "×", "△", "未回答"];
 
   // レスポンス更新処理
   const handleResponseChange = async (
@@ -147,82 +148,85 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
     status: ResponseStatus
   ) => {
     const cellId = `${participant}-${date}`;
-    setUpdating(cellId);
+    // ローディング状態を設定する行をコメントアウトまたは削除
+    // setUpdating(cellId);
     setError(null);
 
     try {
-      const participantName = Array.isArray(participant) ? participant[0] : participant;
+      const participantName = Array.isArray(participant)
+        ? participant[0]
+        : participant;
 
       if (!eventId || !participantName || !date || !status) {
-        throw new Error('必要なデータが不足しています');
+        throw new Error("必要なデータが不足しています");
       }
 
       const newResponses = {
         ...localResponses,
         [participantName]: {
           ...(localResponses[participantName] || {}),
-          [date]: status
-        }
+          [date]: status,
+        },
       };
 
+      // 即座にUI上の状態を更新
       setLocalResponses(newResponses);
+
+      // ドロップダウンを閉じる
+      setActiveDropdown(null);
 
       // onResponseUpdateがある場合はそれを使用、なければAPI呼び出し
       if (onResponseUpdate) {
         onResponseUpdate(participantName, date, status);
       } else {
-        // 直接APIを呼び出す場合
+        // 直接APIを呼び出す場合（バックグラウンドで処理）
         await eventOperations.updateResponse({
           event_id: eventId,
           participant_name: participantName,
           date,
-          status
+          status,
         });
       }
-
-      setActiveDropdown(null);
-
     } catch (error) {
       const errorState = ErrorHandler.handle(error);
       setLocalResponses(initialResponses);
       setError(errorState);
-      console.error('Response update error:', {
+      console.error("Response update error:", {
         participantName: participant,
         date,
         status,
-        error: errorState
+        error: errorState,
       });
     } finally {
-      setUpdating(null);
     }
   };
 
   // ユーティリティ関数
   const getResponseStyle = (status: ResponseStatus) => {
     switch (status) {
-      case '◯':
+      case "◯":
         return {
-          bg: 'bg-[#dcfce7]',
-          icon: '/icons/maru.svg',
-          border: 'border-[#279600]'
+          bg: "bg-[#dcfce7]",
+          icon: "/icons/maru.svg",
+          border: "border-[#279600]",
         };
-      case '×':
+      case "×":
         return {
-          bg: 'bg-[#fee2e2]',
-          icon: '/icons/batsu.svg',
-          border: 'border-[#d54040]'
+          bg: "bg-[#fee2e2]",
+          icon: "/icons/batsu.svg",
+          border: "border-[#d54040]",
         };
-      case '△':
+      case "△":
         return {
-          bg: 'bg-[#fff9c3]',
-          icon: '/icons/sankaku.svg',
-          border: 'border-[#e5ca00]'
+          bg: "bg-[#fff9c3]",
+          icon: "/icons/sankaku.svg",
+          border: "border-[#e5ca00]",
         };
       default:
         return {
-          bg: 'bg-white',
+          bg: "bg-white",
           icon: null,
-          border: 'border-[#939393]'
+          border: "border-[#939393]",
         };
     }
   };
@@ -230,24 +234,29 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const day = date.getDay();
-    const dayStr = ['日', '月', '火', '水', '木', '金', '土'][day];
-    const textColor = day === 0 ? 'text-[#d54040]' :
-      day === 6 ? 'text-[#00b0e9]' :
-        'text-black';
+    const dayStr = ["日", "月", "火", "水", "木", "金", "土"][day];
+    const textColor =
+      day === 0
+        ? "text-[#d54040]"
+        : day === 6
+        ? "text-[#00b0e9]"
+        : "text-black";
     return {
       text: `${date.getDate()}日(${dayStr})`,
-      color: textColor
+      color: textColor,
     };
   };
 
-  const normalizeParticipantName = (participant: string | string[] | any): string => {
+  const normalizeParticipantName = (
+    participant: string | string[] | any
+  ): string => {
     if (Array.isArray(participant)) {
-      return participant[0].replace(/[\[\]\"]/g, '');
+      return participant[0].replace(/[\[\]\"]/g, "");
     }
-    if (typeof participant === 'string') {
-      return participant.replace(/[\[\]\"]/g, '');
+    if (typeof participant === "string") {
+      return participant.replace(/[\[\]\"]/g, "");
     }
-    return String(participant).replace(/[\[\]\"]/g, '');
+    return String(participant).replace(/[\[\]\"]/g, "");
   };
 
   // ドロップダウン制御
@@ -260,16 +269,16 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
     if (
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target as Node) &&
-      !(event.target as Element).closest('.response-button')
+      !(event.target as Element).closest(".response-button")
     ) {
       setActiveDropdown(null);
     }
   };
 
   useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
@@ -278,33 +287,48 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
   }, [initialResponses]);
 
   // 日程の統計計算
-  const dateStats = dates.map(date => {
-    const okCount = participants.reduce((count, participant) => {
-      const participantName = normalizeParticipantName(participant);
-      return count + (localResponses[participantName]?.[date] === '◯' ? 1 : 0);
-    }, 0);
+  const dateStats = dates
+    .map((date) => {
+      const okCount = participants.reduce((count, participant) => {
+        const participantName = normalizeParticipantName(participant);
+        return (
+          count + (localResponses[participantName]?.[date] === "◯" ? 1 : 0)
+        );
+      }, 0);
 
-    const noResponseCount = participants.reduce((count, participant) => {
-      const participantName = normalizeParticipantName(participant);
-      return count + (!localResponses[participantName]?.[date] || localResponses[participantName]?.[date] === '未回答' ? 1 : 0);
-    }, 0);
+      const noResponseCount = participants.reduce((count, participant) => {
+        const participantName = normalizeParticipantName(participant);
+        return (
+          count +
+          (!localResponses[participantName]?.[date] ||
+          localResponses[participantName]?.[date] === "未回答"
+            ? 1
+            : 0)
+        );
+      }, 0);
 
-    return {
-      date,
-      formattedDate: new Date(date).toLocaleDateString('ja-JP', {
-        month: 'numeric',
-        day: 'numeric',
-        weekday: 'short'
-      }),
-      okCount,
-      noResponseCount,
-      percentage: Math.round((okCount / participants.length) * 100)
-    };
-  }).sort((a, b) => b.okCount - a.okCount || a.date.localeCompare(b.date));
+      return {
+        date,
+        formattedDate: new Date(date).toLocaleDateString("ja-JP", {
+          month: "numeric",
+          day: "numeric",
+          weekday: "short",
+        }),
+        okCount,
+        noResponseCount,
+        percentage: Math.round((okCount / participants.length) * 100),
+      };
+    })
+    .sort((a, b) => b.okCount - a.okCount || a.date.localeCompare(b.date));
 
-  const maxOkCount = dateStats.filter(stat => stat.okCount > 0)[0]?.okCount || 0;
-  const bestDates = dateStats.filter(stat => stat.okCount === maxOkCount && maxOkCount > 0);
-  const otherDates = dateStats.filter(stat => stat.okCount < maxOkCount || maxOkCount === 0);
+  const maxOkCount =
+    dateStats.filter((stat) => stat.okCount > 0)[0]?.okCount || 0;
+  const bestDates = dateStats.filter(
+    (stat) => stat.okCount === maxOkCount && maxOkCount > 0
+  );
+  const otherDates = dateStats.filter(
+    (stat) => stat.okCount < maxOkCount || maxOkCount === 0
+  );
 
   // 共有メッセージの状態
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
@@ -316,7 +340,7 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
       setShowCopiedMessage(true);
       setTimeout(() => setShowCopiedMessage(false), 2000);
     } catch (err) {
-      console.error('URLのコピーに失敗しました:', err);
+      console.error("URLのコピーに失敗しました:", err);
     }
   };
 
@@ -324,7 +348,9 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
     <div className="relative" ref={tableRef}>
       {error && (
         <ErrorAlert
-          message={error.message + (error.recovery ? `\n${error.recovery}` : '')}
+          message={
+            error.message + (error.recovery ? `\n${error.recovery}` : "")
+          }
           onDismiss={() => setError(null)}
         />
       )}
@@ -341,7 +367,9 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                 return (
                   <th
                     key={date}
-                    className={`w-[110px] min-w-[110px] h-[50px] ${index < dates.length - 1 ? 'border-r' : ''} border-b border-[#939393] bg-[#d9d9d9] p-4 ${color} text-center text-sm`}
+                    className={`w-[110px] min-w-[110px] h-[50px] ${
+                      index < dates.length - 1 ? "border-r" : ""
+                    } border-b border-[#939393] bg-[#d9d9d9] p-4 ${color} text-center text-sm`}
                   >
                     {text}
                   </th>
@@ -355,13 +383,17 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
 
               return (
                 <tr key={participantName}>
-                  <td className={`sticky left-0 z-20 w-[90px] min-w-[90px] h-[50px] border-r ${pIndex !== participants.length - 1 ? 'border-b' : ''
-                    } border-[#939393] bg-white text-center text-sm`}>
+                  <td
+                    className={`sticky left-0 z-20 w-[90px] min-w-[90px] h-[50px] border-r ${
+                      pIndex !== participants.length - 1 ? "border-b" : ""
+                    } border-[#939393] bg-white text-center text-sm`}
+                  >
                     {normalizeParticipantName(participant)}
                   </td>
                   {dates.map((date, dIndex) => {
                     const cellId = `${participantName}-${date}`;
-                    const status = localResponses[participantName]?.[date] || '未回答';
+                    const status =
+                      localResponses[participantName]?.[date] || "未回答";
                     const { bg, icon } = getResponseStyle(status);
                     const isLastRow = pIndex === participants.length - 1;
                     const isUpdating = updating === cellId;
@@ -370,18 +402,17 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                       <td
                         key={cellId}
                         className={`relative w-[110px] min-w-[110px] h-[50px] 
-                          ${dIndex < dates.length - 1 ? 'border-r' : ''} 
-                          ${!isLastRow ? 'border-b' : ''} 
+                          ${dIndex < dates.length - 1 ? "border-r" : ""} 
+                          ${!isLastRow ? "border-b" : ""} 
                           border-[#939393] ${bg} p-[6px]`}
                       >
                         <button
                           data-cell-id={cellId}
                           className={`response-button w-full h-full flex items-center justify-center gap-2 
                             border border-[#939393] rounded-lg 
-                            hover:bg-opacity-90 transition-colors text-sm
-                            ${isUpdating ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                            hover:bg-opacity-90 transition-colors text-sm`}
                           onClick={() => handleDropdownToggle(cellId)}
-                          disabled={readonly || isUpdating}
+                          disabled={readonly}
                         >
                           <div className="flex items-center justify-center gap-2">
                             {icon ? (
@@ -419,24 +450,28 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                             ref={dropdownRef}
                             className="absolute z-[9999] w-[98px] bg-white border border-[#939393] rounded-lg shadow-lg overflow-hidden"
                             style={{
-                              position: 'fixed',
+                              position: "fixed",
                               left: (() => {
-                                const button = document.querySelector(`[data-cell-id="${cellId}"]`);
+                                const button = document.querySelector(
+                                  `[data-cell-id="${cellId}"]`
+                                );
                                 if (button) {
                                   const rect = button.getBoundingClientRect();
                                   return `${rect.left + rect.width / 2}px`;
                                 }
-                                return '50%';
+                                return "50%";
                               })(),
                               top: (() => {
-                                const button = document.querySelector(`[data-cell-id="${cellId}"]`);
+                                const button = document.querySelector(
+                                  `[data-cell-id="${cellId}"]`
+                                );
                                 if (button) {
                                   const rect = button.getBoundingClientRect();
                                   return `${rect.bottom + 4}px`;
                                 }
-                                return '100%';
+                                return "100%";
                               })(),
-                              transform: 'translateX(-50%)',
+                              transform: "translateX(-50%)",
                             }}
                           >
                             {responseOptions.map((option) => {
@@ -444,9 +479,16 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                               return (
                                 <button
                                   key={option}
-                                  className={`w-full px-2 py-2 flex items-center justify-center gap-1.5 hover:bg-gray-100 ${status === option ? 'bg-gray-100' : ''
-                                    }`}
-                                  onClick={() => handleResponseChange(participantName, date, option)}
+                                  className={`w-full px-2 py-2 flex items-center justify-center gap-1.5 hover:bg-gray-100 ${
+                                    status === option ? "bg-gray-100" : ""
+                                  }`}
+                                  onClick={() =>
+                                    handleResponseChange(
+                                      participantName,
+                                      date,
+                                      option
+                                    )
+                                  }
                                   disabled={isUpdating}
                                 >
                                   {icon ? (
@@ -459,7 +501,9 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                                       />
                                     </div>
                                   ) : (
-                                    <span className="text-[#c4c4c4]">未回答</span>
+                                    <span className="text-[#c4c4c4]">
+                                      未回答
+                                    </span>
                                   )}
                                 </button>
                               );
@@ -482,14 +526,19 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
 
           {bestDates.length > 0 && (
             <div className="space-y-2">
-              {bestDates.map(date => (
+              {bestDates.map((date) => (
                 <div
                   key={date.date}
                   className="bg-[#dcfce7] rounded-lg border border-[#279600] p-4"
                 >
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div className="flex items-center gap-2">
-                      <Image src="/icons/maru.svg" alt="◯" width={16} height={16} />
+                      <Image
+                        src="/icons/maru.svg"
+                        alt="◯"
+                        width={16}
+                        height={16}
+                      />
                       <span>{date.formattedDate}</span>
                     </div>
                     <div className="text-[#279600]">
@@ -502,16 +551,14 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
           )}
 
           <div className="space-y-2 mt-2">
-            {otherDates.map(date => (
+            {otherDates.map((date) => (
               <div
                 key={date.date}
                 className="bg-[#ececec] rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
               >
                 <span className="text-gray-600">{date.formattedDate}</span>
                 {date.noResponseCount === participants.length ? (
-                  <span className="text-gray-500">
-                    未回答
-                  </span>
+                  <span className="text-gray-500">未回答</span>
                 ) : (
                   <span className="text-gray-600">
                     {date.okCount}人参加可能（{date.percentage}%）
