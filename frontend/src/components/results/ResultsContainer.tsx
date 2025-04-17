@@ -56,10 +56,10 @@ const useResponses = (
 
   // ポーリング設定
   const { loading } = usePolling(fetchResponses, {
-    interval: 30000, // 10秒から30秒に変更
-    enabled: true, // 完全に無効にする場合はfalseに設定
+    interval: 30000, // 頻度を下げる (30秒)
+    enabled: true,
     initialData: initialResponses,
-    showLoading: false, // ローディング表示を無効化（このプロパティがなければ追加）
+    showLoading: false, // ローディング表示を無効化
   });
 
   // レスポンス更新処理
@@ -124,16 +124,14 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
     [eventData.participants]
   );
 
-  // レスポンス管理フック
-  const { responses, isUpdating, error, updateResponse, clearError } =
-    useResponses(eventId, eventData.responses);
-
-  // メモ化されたイベントタイトル
+  // メモ化されたイベントタイトル - この部分を追加
   const displayTitle = useMemo(() => event.title || "日程調整", [event.title]);
 
-  const handleEditClick = useCallback(() => {
-    router.push(`/${eventId}/edit`);
-  }, [router, eventId]);
+  // レスポンス管理フック
+  const { responses, error, updateResponse, clearError } = useResponses(
+    eventId,
+    eventData.responses
+  );
 
   // 共有機能
   const handleShare = async () => {
@@ -178,7 +176,7 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
               tabIndex={0}
               data-testid="event-title"
             >
-              {displayTitle}
+              {event.title || "日程調整"}
             </h1>
 
             {event.description && (
@@ -206,7 +204,7 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
           <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
             <button
               className="px-4 py-2 flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg transition-colors"
-              onClick={handleEditClick}
+              onClick={() => router.push(`/${eventId}/edit`)}
               aria-label="日程と参加者を編集する"
               data-testid="edit-button"
             >
@@ -320,12 +318,6 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
           ))}
         </div>
       </div>
-
-      <LoadingOverlay
-        message="更新中..."
-        isVisible={isUpdating}
-        data-testid="loading-overlay"
-      />
     </div>
   );
 };
