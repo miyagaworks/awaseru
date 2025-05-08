@@ -19,22 +19,23 @@
 }
 
 @media (prefers-color-scheme: dark) {
-     :root {
-        --background: #0f172a;
-        --foreground: #f8f9fa;
-        --primary: #3b82f6;
-        --primary-hover:#60a5fa;
-        --secondary: #1f2937;
-        --accent: #a78bfa;
-        --success: #34d399;
-        --warning: #fbbf24;
-        --danger: #f87171;
-        --card: #1e293b;
-        --card-foreground: #f8f9fa;
-        --border: #334155;
-        --input: #334155;
-        --ring: rgba(59, 130, 246, 0.5);
-    }
+  :root {
+    /* ダークモード対応を無効化し、ライトモードの値を上書き */
+    --background: #f8f9fa;
+    --foreground: #171717;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --secondary: #e5e7eb;
+    --accent: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --card: #ffffff;
+    --card-foreground: #171717;
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: rgba(59, 130, 246, 0.5);
+  }
 }
 
 body {
