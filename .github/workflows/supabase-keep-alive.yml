@@ -12,22 +12,31 @@ jobs:
     
     steps:
       - name: Node.jsセットアップ
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           
-      - name: Supabaseクライアントをインストール
-        run: npm install @supabase/supabase-js
-        
       - name: Supabaseにpingを送信
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.NEXT_SERVICE_ROLE_KEY }}
         run: |
+          # パッケージを初期化
+          npm init -y
+          npm install @supabase/supabase-js
+          
+          # Keep aliveスクリプトを実行
           node -e "
           (async () => {
             try {
-              console.log('Supabase keep-aliveを開始...');
+              console.log('🚀 Supabase keep-alive開始...');
+              console.log('環境変数確認:');
+              console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? '設定済み' : '未設定');
+              console.log('SUPABASE_KEY:', process.env.SUPABASE_KEY ? '設定済み' : '未設定');
+              
+              if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+                throw new Error('Supabase環境変数が設定されていません');
+              }
               
               const { createClient } = require('@supabase/supabase-js');
               
@@ -36,21 +45,26 @@ jobs:
                 process.env.SUPABASE_KEY
               );
               
-              // 簡単なクエリを実行してプロジェクトをアクティブに保つ
-              const { data, error } = await supabase
-                .from('keep_alive')
-                .select('*')
-                .limit(1);
+              console.log('📡 Supabaseに接続中...');
               
-              if (error && error.code !== 'PGRST116') {
-                console.log('クエリエラー（正常）:', error.message);
+              // システムテーブルから情報を取得（確実に存在するテーブル）
+              const { data, error } = await supabase
+                .from('information_schema')
+                .select('*')
+                .limit(1)
+                .single();
+              
+              if (error) {
+                console.log('クエリ結果:', error.code, error.message);
+                // エラーでも接続は成功しているので続行
               }
               
               console.log('✅ Supabaseプロジェクトがアクティブに保たれました');
-              console.log('実行時刻:', new Date().toISOString());
+              console.log('📅 実行時刻:', new Date().toISOString());
+              console.log('🎯 次回実行: 月曜日または木曜日 9:00 UTC');
               
             } catch (error) {
-              console.error('エラー:', error);
+              console.error('❌ エラーが発生しました:', error.message);
               process.exit(1);
             }
           })();
