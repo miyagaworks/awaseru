@@ -7,16 +7,16 @@
 ホスト: x162-43-21-137.static.xvps.ne.jp
 ポート: 22（デフォルト）
 ユーザー: root（初期接続用）
-秘密鍵: ~/Projects/awaseru-net/awaseru.pem
+秘密鍵: ~/.ssh/awaseru_new
 ```
 
 ### 1.2 基本的な接続手順
 ```bash
 # 秘密鍵のパーミッション設定
-chmod 600 ~/Projects/awaseru-net/awaseru.pem
+chmod 600 ~/.ssh/awaseru_new
 
 # SSH接続
-ssh -i ~/Projects/awaseru-net/awaseru.pem root@x162-43-21-137.static.xvps.ne.jp
+ssh -i ~/.ssh/awaseru_new root@x162-43-21-137.static.xvps.ne.jp
 
 # 初回接続時やサーバー再構築時のホストキー変更対応
 ssh-keygen -R x162-43-21-137.static.xvps.ne.jp
@@ -72,7 +72,7 @@ AllowUsers root deployer   # rootとdeployerの両方を許可
 systemctl restart ssh
 
 # deployer ユーザーでの接続テスト（別ターミナルで実行）
-ssh -i ~/Projects/awaseru-net/awaseru.pem deployer@x162-43-21-137.static.xvps.ne.jp
+ssh -i ~/.ssh/awaseru_new root@x162-43-21-137.static.xvps.ne.jp
 ```
 
 ### 2.4 ファイアウォール設定

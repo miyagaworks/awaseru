@@ -217,9 +217,11 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
             </h2>
             <Input
               type="text"
-              placeholder="〇〇〇の日程調整"
+              placeholder="日程調整の名前"
               value={formData.message}
-              onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, message: e.target.value }))
+              }
               className="bg-white"
             />
           </div>
@@ -236,15 +238,25 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                 type="text"
                 placeholder="お名前を入力ください。"
                 value={formData.newParticipant}
-                onChange={(e) => setFormData(prev => ({ ...prev, newParticipant: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    newParticipant: e.target.value,
+                  }))
+                }
                 onCompositionStart={() => setIsComposing(true)}
-                onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
+                onCompositionEnd={(
+                  e: React.CompositionEvent<HTMLInputElement>
+                ) => {
                   setIsComposing(false);
                   const target = e.target as HTMLInputElement;
-                  setFormData(prev => ({ ...prev, newParticipant: target.value }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    newParticipant: target.value,
+                  }));
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !isComposing) {
+                  if (e.key === "Enter" && !isComposing) {
                     e.preventDefault();
                     handleParticipantAdd();
                   }
@@ -272,7 +284,7 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => moveParticipant(index, 'up')}
+                        onClick={() => moveParticipant(index, "up")}
                         disabled={index === 0}
                       >
                         <ArrowUp className="h-4 w-4" />
@@ -280,7 +292,7 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => moveParticipant(index, 'down')}
+                        onClick={() => moveParticipant(index, "down")}
                         disabled={index === formData.participants.length - 1}
                       >
                         <ArrowDown className="h-4 w-4" />
@@ -321,14 +333,14 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleMonthChange('prev')}
+                  onClick={() => handleMonthChange("prev")}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleMonthChange('next')}
+                  onClick={() => handleMonthChange("next")}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -338,7 +350,7 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
             <Calendar
               year={calendarState.currentYear}
               month={calendarState.currentMonth}
-              selectedDates={formData.selectedDates.map(item => item.date)}
+              selectedDates={formData.selectedDates.map((item) => item.date)}
               onDateSelect={handleDateSelect}
               onMonthChange={(year, month) => {
                 setCalendarState({ currentYear: year, currentMonth: month });
@@ -349,17 +361,20 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
           {formData.selectedDates.length > 0 && (
             <div className="space-y-2">
               {formData.selectedDates
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .sort(
+                  (a, b) =>
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                )
                 .map((item) => (
                   <div
                     key={item.date}
                     className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm"
                   >
                     <span>
-                      {new Date(item.date).toLocaleDateString('ja-JP', {
-                        month: 'long',
-                        day: 'numeric',
-                        weekday: 'short'
+                      {new Date(item.date).toLocaleDateString("ja-JP", {
+                        month: "long",
+                        day: "numeric",
+                        weekday: "short",
                       })}
                     </span>
                     <Button
@@ -377,9 +392,7 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-lg">
-          {error}
-        </div>
+        <div className="p-4 bg-red-50 text-red-600 rounded-lg">{error}</div>
       )}
 
       {/* ステップ切り替え・作成ボタン */}
@@ -408,9 +421,8 @@ export const EventCreationForm: React.FC<EventCreationFormProps> = ({
           {loadingState.status
             ? loadingState.message
             : step === 1
-              ? '次へ'
-              : '作成する'
-          }
+            ? "次へ"
+            : "作成する"}
         </Button>
       </div>
 
