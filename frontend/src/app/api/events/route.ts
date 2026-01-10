@@ -1,7 +1,6 @@
 // src/app/api/events/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import type { ResponseStatus } from "@/types/database";
+import { eventOperations } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,19 +13,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data: exists, error: existsError } = await supabase
-      .from("events")
-      .select("id")
-      .eq("id", eventId)
-      .maybeSingle();
-
-    if (existsError) {
-      console.error("Error checking event existence:", existsError);
-      return NextResponse.json(
-        { error: "イベントの確認に失敗しました" },
-        { status: 500 }
-      );
-    }
+    const exists = await eventOperations.checkEventExists(eventId);
 
     if (!exists) {
       return NextResponse.json(
@@ -35,20 +22,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data: event, error } = await supabase
-      .from("events")
-      .select("*")
-      .eq("id", eventId)
-      .single();
-
-    if (error) {
-      console.error("Error fetching event:", error);
-      return NextResponse.json(
-        { error: "イベントの取得に失敗しました" },
-        { status: 500 }
-      );
-    }
-
+    const event = await eventOperations.getEvent(eventId);
     return NextResponse.json(event);
   } catch (error) {
     console.error("Error in GET events:", error);
@@ -84,43 +58,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: event, error } = await supabase
-      .from("events")
-      .insert({
-        title,
-        description,
-        dates,
-        participants,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Error creating event:", error);
-      return NextResponse.json(
-        { error: "イベントの作成に失敗しました" },
-        { status: 500 }
-      );
-    }
+    const event = await eventOperations.createEvent({
+      title,
+      description,
+      dates,
+      participants,
+    });
 
     // レスポンスの初期データを作成
-    const responses = dates.flatMap((date: string) =>
-      participants.map((participant_name: string) => ({
-        event_id: event.id,
-        participant_name,
-        date,
-        status: "未回答" as ResponseStatus,
-      }))
+    const responses = eventOperations.generateInitialResponses(
+      event.id,
+      participants,
+      dates
     );
 
-    const { error: responseError } = await supabase
-      .from("responses")
-      .insert(responses);
-
-    if (responseError) {
-      console.error("Error creating initial responses:", responseError);
-      // イベント自体は作成されているので、エラーは返さない
-    }
+    await eventOperations.insertResponses(responses);
 
     return NextResponse.json(event);
   } catch (error) {

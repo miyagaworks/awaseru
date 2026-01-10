@@ -1,6 +1,7 @@
 // app/api/responses/[eventId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { eventOperations } from "@/lib/supabase";
+import type { ResponseStatus } from "@/types/database";
 
 export async function GET(
   request: NextRequest,
@@ -8,18 +9,8 @@ export async function GET(
 ) {
   try {
     const eventId = context.params.eventId;
-
-    const { data, error } = await supabase
-      .from("responses")
-      .select("*")
-      .eq("event_id", eventId);
-
-    if (error) {
-      console.error("Error fetching responses:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    return NextResponse.json(data);
+    const responses = await eventOperations.getResponses(eventId);
+    return NextResponse.json(responses);
   } catch (error) {
     console.error("Error in GET /responses/[eventId]:", error);
     return NextResponse.json(
@@ -37,23 +28,14 @@ export async function PATCH(
     const eventId = context.params.eventId;
     const body = await request.json();
 
-    const { data, error } = await supabase
-      .from("responses")
-      .upsert({
-        event_id: eventId,
-        participant_name: body.participant_name,
-        date: body.date,
-        status: body.status,
-      })
-      .select()
-      .single();
+    const response = await eventOperations.updateResponse({
+      event_id: eventId,
+      participant_name: body.participant_name,
+      date: body.date,
+      status: body.status as ResponseStatus,
+    });
 
-    if (error) {
-      console.error("Error updating response:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Error in PATCH /responses/[eventId]:", error);
     return NextResponse.json(

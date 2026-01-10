@@ -1,6 +1,6 @@
 // src/app/api/events/check/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { eventOperations } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,21 +13,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
-      .from("events")
-      .select("id")
-      .eq("id", eventId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error checking event existence:", error);
-      return NextResponse.json(
-        { error: "イベントの確認に失敗しました" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ exists: !!data });
+    const exists = await eventOperations.checkEventExists(eventId);
+    return NextResponse.json({ exists });
   } catch (error) {
     console.error("Error in check event:", error);
     return NextResponse.json(

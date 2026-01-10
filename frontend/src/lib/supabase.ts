@@ -1,102 +1,69 @@
 // frontend/src/lib/supabase.ts
-import { createClient } from "@supabase/supabase-js";
+// Neon用に書き換え
+import { neon } from "@neondatabase/serverless";
 import type {
-  Database,
+  Event,
+  Response,
   FormattedResponses,
   ResponseStatus,
 } from "@/types/database";
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error("Missing env.NEXT_PUBLIC_SUPABASE_URL");
-}
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error("Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY");
+if (!process.env.DATABASE_URL) {
+  throw new Error("Missing env.DATABASE_URL");
 }
 
-export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  {
-    auth: { persistSession: false },
-  }
-);
+const sql = neon(process.env.DATABASE_URL);
+
+// SQL実行用のエクスポート
+export { sql };
 
 export const eventOperations = {
-  // イベントの存在確認
   async checkEventExists(eventId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase
-        .from("events")
-        .select("id")
-        .eq("id", eventId)
-        .maybeSingle();
-
-      if (error) throw error;
-      return !!data;
+      const result = await sql`SELECT id FROM events WHERE id = ${eventId}`;
+      return result.length > 0;
     } catch (error) {
       console.error("Error in checkEventExists:", error);
       throw error;
     }
   },
 
-  // イベントの取得
-  async getEvent(eventId: string) {
+  async getEvent(eventId: string): Promise<Event> {
     try {
-      const { data: event, error } = await supabase
-        .from("events")
-        .select("*")
-        .eq("id", eventId)
-        .single();
-
-      if (error) throw error;
-      return event;
+      const result = await sql`SELECT * FROM events WHERE id = ${eventId}`;
+      if (result.length === 0) {
+        throw new Error("Event not found");
+      }
+      return result[0] as Event;
     } catch (error) {
       console.error("Error in getEvent:", error);
       throw error;
     }
   },
 
-  // イベントの作成
   async createEvent(data: {
     title?: string;
     description: string | null;
     dates: string[];
     participants: string[];
-  }) {
+  }): Promise<Event> {
     try {
-      console.log('Supabase createEvent called with data:', data);
-      console.log('Using Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-      
-      const { data: event, error } = await supabase
-        .from("events")
-        .insert({
-          title: data.title || "日程調整",
-          description: data.description,
-          dates: data.dates,
-          participants: data.participants,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-      
-      if (!event) {
-        console.error('No event returned from Supabase');
+      const title = data.title || "日程調整";
+      const result = await sql`
+        INSERT INTO events (title, description, dates, participants)
+        VALUES (${title}, ${data.description}, ${data.dates}, ${data.participants})
+        RETURNING *
+      `;
+      if (!result[0]) {
         throw new Error("イベントの作成に失敗しました");
       }
-
-      console.log('Event created successfully:', event);
-      return event;
+      return result[0] as Event;
     } catch (error) {
       console.error("Error in createEvent:", error);
       throw error;
     }
   },
 
-  // イベントの更新
   async updateEvent(
     id: string,
     data: Partial<{
@@ -104,82 +71,86 @@ export const eventOperations = {
       dates: string[];
       participants: string[];
     }>
-  ) {
-    const { error } = await supabase.from("events").update(data).eq("id", id);
-
-    if (error) {
+  ): Promise<void> {
+    try {
+      if (data.description !== undefined) {
+        await sql`UPDATE events SET description = ${data.description} WHERE id = ${id}`;
+      }
+      if (data.dates !== undefined) {
+        await sql`UPDATE events SET dates = ${data.dates} WHERE id = ${id}`;
+      }
+      if (data.participants !== undefined) {
+        await sql`UPDATE events SET participants = ${data.participants} WHERE id = ${id}`;
+      }
+    } catch (error) {
       console.error("Error updating event:", error);
       throw error;
     }
   },
 
-  // レスポンス更新
   async updateResponse(data: {
     event_id: string;
     participant_name: string;
     date: string;
     status: ResponseStatus;
-  }) {
+  }): Promise<Response> {
     try {
-      const { data: response, error } = await supabase
-        .from("responses")
-        .upsert({
-          event_id: data.event_id,
-          participant_name: data.participant_name,
-          date: data.date,
-          status: data.status,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error updating response:", error);
-        throw error;
-      }
-
-      return response;
+      const result = await sql`
+        INSERT INTO responses (event_id, participant_name, date, status)
+        VALUES (${data.event_id}, ${data.participant_name}, ${data.date}, ${data.status})
+        ON CONFLICT (event_id, participant_name, date)
+        DO UPDATE SET status = EXCLUDED.status
+        RETURNING *
+      `;
+      return result[0] as Response;
     } catch (error) {
       console.error("Error in updateResponse:", error);
       throw error;
     }
   },
 
-  // 複数レスポンス更新
   async updateResponses(
-    eventId: string,
+    _eventId: string,
     responses: Array<{
       event_id: string;
       participant_name: string;
       date: string;
       status: ResponseStatus;
     }>
-  ) {
-    const { data, error } = await supabase
-      .from("responses")
-      .upsert(responses)
-      .select();
-
-    if (error) {
+  ): Promise<Response[]> {
+    try {
+      const results: Response[] = [];
+      for (const r of responses) {
+        const result = await sql`
+          INSERT INTO responses (event_id, participant_name, date, status)
+          VALUES (${r.event_id}, ${r.participant_name}, ${r.date}, ${r.status})
+          ON CONFLICT (event_id, participant_name, date)
+          DO UPDATE SET status = EXCLUDED.status
+          RETURNING *
+        `;
+        if (result[0]) {
+          results.push(result[0] as Response);
+        }
+      }
+      return results;
+    } catch (error) {
+      console.error("Error in updateResponses:", error);
       throw error;
     }
-    return data;
   },
 
-  // レスポンス取得
-  async getResponses(eventId: string) {
-    const { data, error } = await supabase
-      .from("responses")
-      .select("*")
-      .eq("event_id", eventId);
-
-    if (error) {
+  async getResponses(eventId: string): Promise<Response[]> {
+    try {
+      const result = await sql`
+        SELECT * FROM responses WHERE event_id = ${eventId}
+      `;
+      return result as Response[];
+    } catch (error) {
       console.error("Error fetching responses:", error);
       throw error;
     }
-    return data || [];
   },
 
-  // レスポンスのフォーマット
   formatResponses(
     responses: Array<{
       participant_name: string;
@@ -188,21 +159,15 @@ export const eventOperations = {
     }>
   ): FormattedResponses {
     const formatted: FormattedResponses = {};
-
     responses.forEach((response) => {
-      // 参加者ごとのオブジェクトがなければ作成
       if (!formatted[response.participant_name]) {
         formatted[response.participant_name] = {};
       }
-
-      // 日付ごとのステータスを設定
       formatted[response.participant_name][response.date] = response.status;
     });
-
     return formatted;
   },
 
-  // 初期レスポンスの生成
   generateInitialResponses(
     eventId: string,
     participants: string[],
@@ -218,31 +183,50 @@ export const eventOperations = {
         event_id: eventId,
         participant_name: participant,
         date: date,
-        status: "未回答",
+        status: "未回答" as ResponseStatus,
       }))
     );
   },
 
-  // イベントと回答の一括取得
   async getEventWithResponses(eventId: string) {
     try {
       const [eventResult, responsesResult] = await Promise.all([
-        supabase.from("events").select("*").eq("id", eventId).single(),
-        supabase.from("responses").select("*").eq("event_id", eventId),
+        sql`SELECT * FROM events WHERE id = ${eventId}`,
+        sql`SELECT * FROM responses WHERE event_id = ${eventId}`,
       ]);
 
-      if (eventResult.error) throw eventResult.error;
-      if (responsesResult.error) throw responsesResult.error;
+      if (eventResult.length === 0) {
+        throw new Error("Event not found");
+      }
 
-      const event = eventResult.data;
-      const responses = this.formatResponses(responsesResult.data || []);
+      const event = eventResult[0] as Event;
+      const responses = this.formatResponses(responsesResult as Response[]);
 
-      return {
-        event,
-        responses,
-      };
+      return { event, responses };
     } catch (error) {
       console.error("Error in getEventWithResponses:", error);
+      throw error;
+    }
+  },
+
+  async insertResponses(
+    responses: Array<{
+      event_id: string;
+      participant_name: string;
+      date: string;
+      status: ResponseStatus;
+    }>
+  ): Promise<void> {
+    try {
+      for (const r of responses) {
+        await sql`
+          INSERT INTO responses (event_id, participant_name, date, status)
+          VALUES (${r.event_id}, ${r.participant_name}, ${r.date}, ${r.status})
+          ON CONFLICT (event_id, participant_name, date) DO NOTHING
+        `;
+      }
+    } catch (error) {
+      console.error("Error in insertResponses:", error);
       throw error;
     }
   },
