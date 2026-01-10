@@ -13,7 +13,7 @@ import type {
   ResponseStatus,
 } from "../../types/database";
 import { useRouter } from "next/navigation";
-import { eventOperations } from "../../lib/supabase";
+import { formatResponses } from "../../lib/helpers";
 import usePolling from "../../lib/hooks/usePolling";
 import { Calendar, Users, Clock, Edit, Share, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -39,11 +39,13 @@ const useResponses = (
   // ポーリング用のデータフェッチコールバック
   const fetchResponses = useCallback(async (): Promise<FormattedResponses> => {
     try {
-      // レスポンスデータを取得（配列形式）
-      const responsesData = await eventOperations.getResponses(eventId);
+      // APIを通じてレスポンスデータを取得
+      const res = await fetch(`/api/responses/${eventId}`);
+      if (!res.ok) throw new Error("レスポンスの取得に失敗しました");
+      const responsesData = await res.json();
 
       // 配列からFormattedResponses形式に変換
-      const formattedResponses = eventOperations.formatResponses(responsesData);
+      const formattedResponses = formatResponses(responsesData);
 
       setResponses(formattedResponses);
       return formattedResponses;
@@ -76,13 +78,17 @@ const useResponses = (
           return;
         }
 
-        // レスポンスの更新
-        await eventOperations.updateResponse({
-          event_id: eventId,
-          participant_name: participant,
-          date,
-          status,
+        // APIを通じてレスポンスを更新
+        const res = await fetch(`/api/responses/${eventId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            participant_name: participant,
+            date,
+            status,
+          }),
         });
+        if (!res.ok) throw new Error("レスポンスの更新に失敗しました");
 
         // 状態を更新
         setResponses((prev) => ({

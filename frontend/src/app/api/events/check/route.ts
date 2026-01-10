@@ -1,6 +1,6 @@
 // src/app/api/events/check/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { eventOperations } from "@/lib/supabase";
+import { eventOperations } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {

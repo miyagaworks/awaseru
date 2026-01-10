@@ -1,6 +1,6 @@
 // src/app/api/events/[eventId]/responses/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { eventOperations } from "@/lib/supabase";
+import { eventOperations } from "@/lib/db";
 import type { ResponseStatus } from "@/types/database";
 
 export async function GET(

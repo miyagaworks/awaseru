@@ -1,5 +1,5 @@
-// frontend/src/lib/supabase.ts
-// Neon用に書き換え
+// frontend/src/lib/db.ts
+// Neon データベース接続
 import { neon } from "@neondatabase/serverless";
 import type {
   Event,

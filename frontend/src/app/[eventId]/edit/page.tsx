@@ -4,7 +4,6 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { EventEditor } from "@/components/events/EventEditor";
-import { eventOperations } from "@/lib/supabase";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -27,7 +26,11 @@ export default function EditEventPage() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const eventData = await eventOperations.getEvent(eventId);
+        const res = await fetch(`/api/events/${eventId}`);
+        if (!res.ok) {
+          throw new Error("イベントの取得に失敗しました");
+        }
+        const eventData = await res.json();
         setEvent(eventData);
       } catch (err) {
         console.error("イベント取得エラー:", err);
@@ -45,10 +48,16 @@ export default function EditEventPage() {
   const handleSave = async (dates: string[], participants: string[]) => {
     setSaving(true);
     try {
-      await eventOperations.updateEvent(eventId, {
-        dates,
-        participants,
+      const res = await fetch(`/api/events/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ dates, participants }),
       });
+      if (!res.ok) {
+        throw new Error("イベントの更新に失敗しました");
+      }
       router.push(`/${eventId}/results`);
     } catch (err) {
       console.error("保存エラー:", err);

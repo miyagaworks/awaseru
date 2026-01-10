@@ -4,9 +4,9 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ResultsContainer } from "@/components/results/ResultsContainer";
-import { eventOperations } from "@/lib/supabase";
-import type { Event, EventData, FormattedResponses } from "@/types/database";
-import { Calendar, Users, RefreshCw } from "lucide-react";
+import { formatResponses } from "@/lib/helpers";
+import type { Event, EventData } from "@/types/database";
+import { RefreshCw } from "lucide-react";
 
 export default function EventResultsPage() {
   const params = useParams();
@@ -21,15 +21,18 @@ export default function EventResultsPage() {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        // イベント情報を取得
-        const event = await eventOperations.getEvent(eventId);
+        // APIを通じてイベント情報を取得
+        const eventRes = await fetch(`/api/events?eventId=${eventId}`);
+        if (!eventRes.ok) throw new Error("イベントの取得に失敗しました");
+        const event = await eventRes.json();
 
-        // レスポンスデータを取得
-        const responsesData = await eventOperations.getResponses(eventId);
+        // APIを通じてレスポンスデータを取得
+        const responsesRes = await fetch(`/api/responses/${eventId}`);
+        if (!responsesRes.ok) throw new Error("レスポンスの取得に失敗しました");
+        const responsesData = await responsesRes.json();
 
         // レスポンスデータをフォーマット
-        const formattedResponses =
-          eventOperations.formatResponses(responsesData);
+        const formattedResponses = formatResponses(responsesData);
 
         // データを設定
         setData({
