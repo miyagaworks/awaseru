@@ -119,20 +119,22 @@ export const eventOperations = {
     }>
   ): Promise<Response[]> {
     try {
-      const results: Response[] = [];
-      for (const r of responses) {
-        const result = await sql`
-          INSERT INTO responses (event_id, participant_name, date, status)
-          VALUES (${r.event_id}, ${r.participant_name}, ${r.date}, ${r.status})
-          ON CONFLICT (event_id, participant_name, date)
-          DO UPDATE SET status = EXCLUDED.status
-          RETURNING *
-        `;
-        if (result[0]) {
-          results.push(result[0] as Response);
-        }
-      }
-      return results;
+      if (responses.length === 0) return [];
+
+      // 全クエリを並列実行して高速化
+      const results = await Promise.all(
+        responses.map((r) =>
+          sql`
+            INSERT INTO responses (event_id, participant_name, date, status)
+            VALUES (${r.event_id}, ${r.participant_name}, ${r.date}, ${r.status})
+            ON CONFLICT (event_id, participant_name, date)
+            DO UPDATE SET status = EXCLUDED.status
+            RETURNING *
+          `
+        )
+      );
+
+      return results.flatMap((r) => r) as Response[];
     } catch (error) {
       console.error("Error in updateResponses:", error);
       throw error;
@@ -218,13 +220,18 @@ export const eventOperations = {
     }>
   ): Promise<void> {
     try {
-      for (const r of responses) {
-        await sql`
-          INSERT INTO responses (event_id, participant_name, date, status)
-          VALUES (${r.event_id}, ${r.participant_name}, ${r.date}, ${r.status})
-          ON CONFLICT (event_id, participant_name, date) DO NOTHING
-        `;
-      }
+      if (responses.length === 0) return;
+
+      // 全クエリを並列実行して高速化
+      await Promise.all(
+        responses.map((r) =>
+          sql`
+            INSERT INTO responses (event_id, participant_name, date, status)
+            VALUES (${r.event_id}, ${r.participant_name}, ${r.date}, ${r.status})
+            ON CONFLICT (event_id, participant_name, date) DO NOTHING
+          `
+        )
+      );
     } catch (error) {
       console.error("Error in insertResponses:", error);
       throw error;
