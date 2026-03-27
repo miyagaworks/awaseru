@@ -17,6 +17,7 @@ import { formatResponses } from "../../lib/helpers";
 import usePolling from "../../lib/hooks/usePolling";
 import { Calendar, Users, Clock, Edit, Share, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { CalendarExportButtons } from "../ui/CalendarExportButtons";
 
 interface ResultsContainerProps {
   eventId: string;
@@ -299,6 +300,8 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
             responses={responses}
             readonly={false}
             onResponseUpdate={updateResponse}
+            eventTitle={displayTitle}
+            eventDescription={event.description}
           />
         </div>
       </div>
@@ -313,12 +316,21 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
           data-testid="date-summaries"
         >
           {eventData.dates.map((date) => (
-            <DateSummary
-              key={date}
-              date={date}
-              responses={responses}
-              participants={normalizedParticipants}
-            />
+            <div key={date} className="relative">
+              <DateSummary
+                date={date}
+                responses={responses}
+                participants={normalizedParticipants}
+              />
+              <div className="absolute top-3 right-12">
+                <CalendarExportButtons
+                  date={date}
+                  title={displayTitle}
+                  description={event.description}
+                  size="sm"
+                />
+              </div>
+            </div>
           ))}
         </div>
       </div>

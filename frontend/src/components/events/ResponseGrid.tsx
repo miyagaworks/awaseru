@@ -8,6 +8,7 @@ import type { ResponseStatus, FormattedResponses } from '../../types/database';
 import { ErrorHandler } from '../../lib/errors/errorHandler';
 import type { ErrorState } from '../../lib/errors/types';
 import { ErrorAlert } from '../../components/ui/ErrorAlert';
+import { CalendarExportButtons } from '../ui/CalendarExportButtons';
 
 interface ResponseGridProps {
   eventId: string;
@@ -16,6 +17,8 @@ interface ResponseGridProps {
   responses: FormattedResponses;
   readonly?: boolean;
   onResponseUpdate?: (participant: string, date: string, status: ResponseStatus) => void;
+  eventTitle?: string;
+  eventDescription?: string | null;
 }
 
 interface RecommendedDatesProps {
@@ -138,7 +141,9 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
   participants,
   responses: initialResponses,
   readonly = false,
-  onResponseUpdate
+  onResponseUpdate,
+  eventTitle,
+  eventDescription,
 }) => {
   // refs
   const tableRef = useRef<HTMLDivElement>(null);
@@ -585,8 +590,18 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                       />
                       <span>{date.formattedDate}</span>
                     </div>
-                    <div className="text-[#279600] text-xs">
-                      {date.okCount}人参加可能（{date.percentage}%）
+                    <div className="flex items-center gap-2">
+                      <div className="text-[#279600] text-xs">
+                        {date.okCount}人参加可能（{date.percentage}%）
+                      </div>
+                      {eventTitle && (
+                        <CalendarExportButtons
+                          date={date.date}
+                          title={eventTitle}
+                          description={eventDescription}
+                          size="sm"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
