@@ -21,15 +21,17 @@ export default function EventResultsPage() {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        // APIを通じてイベント情報を取得
-        const eventRes = await fetch(`/api/events?eventId=${eventId}`);
+        // イベント情報とレスポンスデータを並列取得
+        const [eventRes, responsesRes] = await Promise.all([
+          fetch(`/api/events?eventId=${eventId}`),
+          fetch(`/api/responses/${eventId}`),
+        ]);
         if (!eventRes.ok) throw new Error("イベントの取得に失敗しました");
-        const event = await eventRes.json();
-
-        // APIを通じてレスポンスデータを取得
-        const responsesRes = await fetch(`/api/responses/${eventId}`);
         if (!responsesRes.ok) throw new Error("レスポンスの取得に失敗しました");
-        const responsesData = await responsesRes.json();
+        const [event, responsesData] = await Promise.all([
+          eventRes.json(),
+          responsesRes.json(),
+        ]);
 
         // レスポンスデータをフォーマット
         const formattedResponses = formatResponses(responsesData);

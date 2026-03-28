@@ -8,19 +8,16 @@ export async function GET(
 ) {
   try {
     const eventId = params.eventId;
-    const exists = await eventOperations.checkEventExists(eventId);
-
-    if (!exists) {
+    const event = await eventOperations.getEvent(eventId);
+    return NextResponse.json(event);
+  } catch (error) {
+    console.error("Error in GET /events/[eventId]:", error);
+    if (error instanceof Error && error.message === "Event not found") {
       return NextResponse.json(
         { error: "指定されたイベントが見つかりません" },
         { status: 404 }
       );
     }
-
-    const event = await eventOperations.getEvent(eventId);
-    return NextResponse.json(event);
-  } catch (error) {
-    console.error("Error in GET /events/[eventId]:", error);
     return NextResponse.json(
       { error: "イベントの取得に失敗しました" },
       { status: 500 }

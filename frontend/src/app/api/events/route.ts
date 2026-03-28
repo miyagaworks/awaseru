@@ -13,19 +13,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const exists = await eventOperations.checkEventExists(eventId);
-
-    if (!exists) {
+    const event = await eventOperations.getEvent(eventId);
+    return NextResponse.json(event);
+  } catch (error) {
+    console.error("Error in GET events:", error);
+    if (error instanceof Error && error.message === "Event not found") {
       return NextResponse.json(
         { error: "指定されたイベントが見つかりません" },
         { status: 404 }
       );
     }
-
-    const event = await eventOperations.getEvent(eventId);
-    return NextResponse.json(event);
-  } catch (error) {
-    console.error("Error in GET events:", error);
     return NextResponse.json(
       { error: "イベントの取得に失敗しました" },
       { status: 500 }
