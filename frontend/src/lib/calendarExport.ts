@@ -38,11 +38,7 @@ export function generateIcsContent(params: CalendarExportParams): string {
     .replace(/[-:]/g, "")
     .replace(/\.\d{3}/, "");
 
-  const descLine = description
-    ? `DESCRIPTION:${description.replace(/\n/g, "\\n")}\r\n`
-    : "";
-
-  return [
+  const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//awaseru.net//NONSGML v1.0//EN",
@@ -53,41 +49,34 @@ export function generateIcsContent(params: CalendarExportParams): string {
     `DTSTART;VALUE=DATE:${dtStart}`,
     `DTEND;VALUE=DATE:${dtEnd}`,
     `SUMMARY:${title}`,
-    ...(descLine ? [descLine.trim()] : []),
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+  ];
+
+  if (description) {
+    lines.push(`DESCRIPTION:${description.replace(/\n/g, "\\n")}`);
+  }
+
+  lines.push("END:VEVENT", "END:VCALENDAR");
+
+  return lines.join("\r\n");
 }
 
 /**
- * ICSファイルをダウンロード
+ * ICSファイルをダウンロード（iOS/Android/PC対応）
  */
 export function downloadIcsFile(params: CalendarExportParams): void {
   const content = generateIcsContent(params);
   const filename = `${params.title}-${params.date}.ics`;
 
-  // iOS Safari対応: data URIを使用
-  const isIOS =
-    typeof navigator !== "undefined" &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-  if (isIOS) {
-    const dataUri =
-      "data:text/calendar;charset=utf-8," + encodeURIComponent(content);
-    window.open(dataUri);
-  } else {
-    const blob = new Blob([content], {
-      type: "text/calendar;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
+  // data URI方式: iOS Safari・Android Chrome両方で動作する
+  const dataUri =
+    "data:text/calendar;charset=utf-8," + encodeURIComponent(content);
+  const a = document.createElement("a");
+  a.href = dataUri;
+  a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 /**

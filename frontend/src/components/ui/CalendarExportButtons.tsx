@@ -13,14 +13,12 @@ interface CalendarExportButtonsProps {
   date: string;
   title: string;
   description?: string | null;
-  size?: "sm" | "md";
 }
 
 export const CalendarExportButtons: React.FC<CalendarExportButtonsProps> = ({
   date,
   title,
   description,
-  size = "sm",
 }) => {
   const params: CalendarExportParams = {
     date,
@@ -37,29 +35,23 @@ export const CalendarExportButtons: React.FC<CalendarExportButtonsProps> = ({
     downloadIcsFile(params);
   };
 
-  const iconSize = size === "sm" ? 14 : 16;
-  const btnClass =
-    size === "sm"
-      ? "p-1 rounded-md text-xs"
-      : "p-1.5 rounded-lg text-sm";
-
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex flex-wrap gap-2 mt-2">
       <button
         onClick={handleGoogleCalendar}
-        className={`${btnClass} text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors`}
-        title="Googleカレンダーに追加"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-300 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-50 hover:border-blue-400 transition-colors shadow-sm"
         aria-label="Googleカレンダーに追加"
       >
-        <CalendarPlus size={iconSize} />
+        <CalendarPlus size={14} />
+        Googleカレンダーに追加
       </button>
       <button
         onClick={handleIcsDownload}
-        className={`${btnClass} text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors`}
-        title="カレンダーファイル(.ics)をダウンロード"
-        aria-label="カレンダーファイルをダウンロード"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
+        aria-label="iCal形式でダウンロード"
       >
-        <Download size={iconSize} />
+        <Download size={14} />
+        iCalダウンロード
       </button>
     </div>
   );

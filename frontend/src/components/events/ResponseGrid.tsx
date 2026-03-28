@@ -574,11 +574,11 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
           </h3>
 
           {bestDates.length > 0 && (
-            <div className="space-y-1 text-sm">
+            <div className="space-y-2 text-sm">
               {bestDates.map((date) => (
                 <div
                   key={date.date}
-                  className="bg-[#f0fdf4] rounded-md border border-[#86efac] p-2"
+                  className="bg-[#f0fdf4] rounded-md border border-[#86efac] p-3"
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1">
@@ -590,20 +590,17 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                       />
                       <span>{date.formattedDate}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-[#279600] text-xs">
-                        {date.okCount}人参加可能（{date.percentage}%）
-                      </div>
-                      {eventTitle && (
-                        <CalendarExportButtons
-                          date={date.date}
-                          title={eventTitle}
-                          description={eventDescription}
-                          size="sm"
-                        />
-                      )}
+                    <div className="text-[#279600] text-xs">
+                      {date.okCount}人参加可���（{date.percentage}%）
                     </div>
                   </div>
+                  {eventTitle && (
+                    <CalendarExportButtons
+                      date={date.date}
+                      title={eventTitle}
+                      description={eventDescription}
+                    />
+                  )}
                 </div>
               ))}
             </div>

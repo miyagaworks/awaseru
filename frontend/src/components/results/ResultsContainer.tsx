@@ -300,7 +300,7 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
             responses={responses}
             readonly={false}
             onResponseUpdate={updateResponse}
-            eventTitle={displayTitle}
+            eventTitle={event.title || ""}
             eventDescription={event.description}
           />
         </div>
@@ -316,18 +316,17 @@ export const ResultsContainer: React.FC<ResultsContainerProps> = ({
           data-testid="date-summaries"
         >
           {eventData.dates.map((date) => (
-            <div key={date} className="relative">
+            <div key={date} className="flex flex-col">
               <DateSummary
                 date={date}
                 responses={responses}
                 participants={normalizedParticipants}
               />
-              <div className="absolute top-3 right-12">
+              <div className="mt-2">
                 <CalendarExportButtons
                   date={date}
-                  title={displayTitle}
+                  title={event.title || ""}
                   description={event.description}
-                  size="sm"
                 />
               </div>
             </div>
