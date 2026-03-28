@@ -184,8 +184,8 @@ export default function CreatePage() {
 
     try {
       const eventData = {
-        title: "イベント調整", // タイトルを追加
-        description: description || null,
+        title: description || "日程調整",
+        description: null,
         dates: selectedDates.map((item) => item.date),
         participants: participants.map((p) => p.name),
       };
@@ -286,15 +286,15 @@ export default function CreatePage() {
       >
         {currentStep === 1 && (
           <div className="space-y-6">
-            {/* イベントの説明 */}
+            {/* イベント名 */}
             <div className="space-y-2">
               <h2 className="text-base flex items-center gap-2 font-medium">
-                イベントの説明
+                イベント名
                 <span className="text-sm text-gray-500">（任意）</span>
               </h2>
               <Input
                 type="text"
-                placeholder="日程調整の名前"
+                placeholder="例: チーム定例会議"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="bg-white focus:ring-blue-500 focus:border-blue-500"
