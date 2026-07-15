@@ -22,6 +22,8 @@ interface EventCreateParams {
   description: string | null;
   dates: string[];
   participants: string[];
+  // オーナー専用リンクの合言葉（URLの ?k= から取得。サーバー側の上限判定にのみ使用）
+  k?: string;
 }
 
 interface ResponseParams {

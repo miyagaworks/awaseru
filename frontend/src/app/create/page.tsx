@@ -1,7 +1,7 @@
 // frontend/src/app/create/page.tsx
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Calendar } from "../../components/events/Calendar";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -74,6 +74,17 @@ export default function CreatePage() {
   const [isComposing, setIsComposing] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1: 参加者情報, 2: 日程選択
 
+  // オーナー専用リンクの合言葉（URLの ?k= から取得）。
+  // 値があるときだけ参加者上限を30名に引き上げる（最終判定はサーバー側で行う）。
+  const [unlockKey, setUnlockKey] = useState<string | null>(null);
+  const maxParticipants = unlockKey ? 30 : 10;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const k = new URLSearchParams(window.location.search).get("k");
+    if (k) setUnlockKey(k);
+  }, []);
+
   // 参照
   const participantInputRef = useRef<HTMLInputElement>(null);
 
@@ -112,10 +123,14 @@ export default function CreatePage() {
     const trimmedName = newParticipant.trim();
     if (
       !trimmedName ||
-      participants.length >= 10 ||
+      participants.length >= maxParticipants ||
       participants.some((p) => p.name === trimmedName)
     ) {
-      setError(participants.length >= 10 ? "参加者は最大10名までです" : "");
+      setError(
+        participants.length >= maxParticipants
+          ? `参加者は最大${maxParticipants}名までです`
+          : ""
+      );
       return;
     }
 
@@ -188,6 +203,8 @@ export default function CreatePage() {
         description: null,
         dates: selectedDates.map((item) => item.date),
         participants: participants.map((p) => p.name),
+        // 合言葉があるときだけ付与（サーバー側で30名までの解錠に使用）
+        ...(unlockKey ? { k: unlockKey } : {}),
       };
 
       console.log("Creating event with data:", eventData);
@@ -332,7 +349,7 @@ export default function CreatePage() {
                 />
                 <Button
                   onClick={handleParticipantAdd}
-                  disabled={participants.length >= 10}
+                  disabled={participants.length >= maxParticipants}
                   className="bg-blue-600 hover:bg-blue-700 text-white transition-colors whitespace-nowrap"
                 >
                   追加
@@ -391,7 +408,9 @@ export default function CreatePage() {
               {participants.length > 0 && (
                 <div className="flex justify-between items-center text-sm text-gray-500 px-2">
                   <span>現在の参加者数: {participants.length}名</span>
-                  <span>残り: {10 - participants.length}名まで追加可能</span>
+                  <span>
+                    残り: {maxParticipants - participants.length}名まで追加可能
+                  </span>
                 </div>
               )}
             </div>

@@ -13,7 +13,7 @@ CREATE TABLE events (
   title TEXT,
   description TEXT,
   dates DATE[] NOT NULL,
-  participants TEXT[] NOT NULL CHECK (array_length(participants, 1) <= 20),
+  participants TEXT[] NOT NULL CHECK (array_length(participants, 1) <= 30),
   created_at TIMESTAMPTZ DEFAULT now(),
   expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '3 months')
 );
