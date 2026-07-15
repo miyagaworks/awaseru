@@ -9,6 +9,11 @@ export const metadata: Metadata = {
     "アワセルは会議や打ち合わせの日程調整を簡単に行えるオンラインツールです。参加者の都合を一目で確認でき、URLを共有するだけで回答を集められます。登録不要で今すぐ無料でご利用いただけます。",
   metadataBase: new URL("https://awaseru.net"),
   manifest: "/manifest.json",
+  icons: {
+    apple: [
+      { url: "/pwa/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "ja_JP",
