@@ -591,7 +591,7 @@ export const ResponseGrid: React.FC<ResponseGridProps> = ({
                       <span>{date.formattedDate}</span>
                     </div>
                     <div className="text-[#279600] text-xs">
-                      {date.okCount}人参加可���（{date.percentage}%）
+                      {date.okCount}人参加可能（{date.percentage}%）
                     </div>
                   </div>
                   {eventTitle && (
