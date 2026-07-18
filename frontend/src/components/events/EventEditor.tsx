@@ -1,7 +1,7 @@
 // src/components/events/EventEditor.tsx
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { X, Plus, Calendar as CalendarIcon, Users } from 'lucide-react';
@@ -42,6 +42,39 @@ export const EventEditor = ({
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
   const newParticipantInputRef = useRef<HTMLInputElement>(null);
 
+  // オーナー専用リンクの合言葉（URLの ?k= または端末に記憶した値から取得）。
+  // 値があるときだけ参加者上限を30名に引き上げる（作成画面 create/page.tsx と同じ方式）。
+  const [unlockKey, setUnlockKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    // 端末に合言葉を記憶するキー名（iPhoneのホーム画面追加で ?k= が消えても解錠を維持するため）
+    const STORAGE_KEY = 'awaseru_owner_key';
+    const k = new URLSearchParams(window.location.search).get('k');
+    if (k) {
+      // URLに合言葉がある場合：その端末に記憶し、以後 ?k= 無しでも解錠する（新しい合言葉で毎回上書き）
+      setUnlockKey(k);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, k);
+      } catch {
+        // プライベートモード等で localStorage が使えなくても画面は壊さない
+      }
+    } else {
+      // URLに合言葉が無い場合：記憶済みの合言葉があれば復元する（無ければ未解錠=10名のまま）
+      try {
+        const saved = window.localStorage.getItem(STORAGE_KEY);
+        if (saved) setUnlockKey(saved);
+      } catch {
+        // 取得に失敗しても未解錠のまま処理を続ける
+      }
+    }
+  }, []);
+
+  // 合言葉があれば30名、無ければ10名。ただし既存の参加者数より下には絶対にロックしない
+  // （別端末など合言葉が無い状態で30名イベントを開いても壊れないようにするため）。
+  const baseMax = unlockKey ? 30 : 10;
+  const maxParticipants = Math.max(baseMax, initialParticipants.length);
+
   const handleDateSelect = (selectedDate: string) => {
     if (dates.includes(selectedDate)) {
       setErrors(prev => ({
@@ -75,10 +108,10 @@ export const EventEditor = ({
   };
 
   const addParticipant = () => {
-    if (participants.length >= 20) {
-      setErrors(prev => ({ 
-        ...prev, 
-        participants: '参加者は最大20名までです' 
+    if (participants.length >= maxParticipants) {
+      setErrors(prev => ({
+        ...prev,
+        participants: `参加者は最大${maxParticipants}名までです`
       }));
       return;
     }
@@ -280,7 +313,7 @@ export const EventEditor = ({
           variant="outline"
           size="sm"
           className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-          disabled={disabled || participants.length >= 20}
+          disabled={disabled || participants.length >= maxParticipants}
           data-testid="add-participant-button"
         >
           <Plus className="w-4 h-4" />
@@ -337,7 +370,7 @@ export const EventEditor = ({
       {participants.length > 0 && (
         <div className="flex justify-between items-center text-sm text-gray-500 px-2">
           <span>現在の参加者数: {participants.length}名</span>
-          <span>残り: {10 - participants.length}名まで追加可能</span>
+          <span>残り: {Math.max(0, maxParticipants - participants.length)}名まで追加可能</span>
         </div>
       )}
     </div>
