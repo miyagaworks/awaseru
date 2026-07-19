@@ -70,9 +70,12 @@ export const EventEditor = ({
     }
   }, []);
 
-  // 合言葉があれば30名、無ければ10名。ただし既存の参加者数より下には絶対にロックしない
+  // 合言葉があるか、または既に10名を超えるイベント（通常リンクはサーバー側で作成時10名までに
+  // 制限されるため、10名超は必ずオーナー専用リンクで作成されたもの）は上限を30名に解錠する。
+  // これにより編集画面では合言葉の再取得なしで30名まで追加できる。
+  // なお Math.max により既存の参加者数より下には絶対にロックしない
   // （別端末など合言葉が無い状態で30名イベントを開いても壊れないようにするため）。
-  const baseMax = unlockKey ? 30 : 10;
+  const baseMax = (unlockKey || initialParticipants.length > 10) ? 30 : 10;
   const maxParticipants = Math.max(baseMax, initialParticipants.length);
 
   const handleDateSelect = (selectedDate: string) => {
