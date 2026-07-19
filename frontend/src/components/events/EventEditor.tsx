@@ -41,6 +41,9 @@ export const EventEditor = ({
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
   const newParticipantInputRef = useRef<HTMLInputElement>(null);
+  // 「追加」直後だけ新規行へスクロール＆フォーカスするためのフラグ。
+  // participants.length の変化のうち「追加」由来のものだけを区別する（削除では発火させない）。
+  const justAddedParticipantRef = useRef(false);
 
   // オーナー専用リンクの合言葉（URLの ?k= または端末に記憶した値から取得）。
   // 値があるときだけ参加者上限を30名に引き上げる（作成画面 create/page.tsx と同じ方式）。
@@ -69,6 +72,21 @@ export const EventEditor = ({
       }
     }
   }, []);
+
+  // 「追加」直後に新規行を可視化する。iOS Safari ではユーザー操作から遅延したプログラム focus() が
+  // ブロックされ自動スクロールが効かないため、操作制約を受けない scrollIntoView で確実に見せる。
+  useEffect(() => {
+    // フラグは冒頭で必ず戻す（削除など「追加」以外の length 変化で誤発火させないため）
+    if (!justAddedParticipantRef.current) return;
+    justAddedParticipantRef.current = false;
+    const el = newParticipantInputRef.current;
+    if (!el) return;
+    // scrollIntoView はユーザー操作制約を受けないため iOS でも確実に新規行が可視範囲に入る
+    el.scrollIntoView({ block: 'nearest' });
+    // focus は iOS で無視されても、行が見えていれば手動タップできるので害はない
+    el.focus();
+    el.setSelectionRange(0, 0);
+  }, [participants.length]);
 
   // 合言葉があるか、または既に10名を超えるイベント（通常リンクはサーバー側で作成時10名までに
   // 制限されるため、10名超は必ずオーナー専用リンクで作成されたもの）は上限を30名に解錠する。
@@ -130,12 +148,9 @@ export const EventEditor = ({
     setParticipants(prev => [...prev, '']);
     setErrors(prev => ({ ...prev, participants: undefined }));
 
-    // より確実なフォーカス制御のために requestAnimationFrame を使用
-    requestAnimationFrame(() => {
-      newParticipantInputRef.current?.focus();
-      // 入力欄の先頭にカーソルを配置
-      newParticipantInputRef.current?.setSelectionRange(0, 0);
-    });
+    // 追加直後フラグを立て、participants.length の変化を検知する useEffect 側で
+    // scrollIntoView によるスクロール＋focus を行う（iOS Safari で自動スクロールを確実にするため）。
+    justAddedParticipantRef.current = true;
   };
 
   const removeParticipant = (index: number) => {
@@ -258,15 +273,16 @@ export const EventEditor = ({
             日程が設定されていません。「追加」ボタンから日程を設定してください。
           </div>
         )}
-        {errors.dates && (
-          <p className="text-sm text-red-500 mt-1 flex items-center gap-1.5" data-testid="date-error">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-            </svg>
-            {errors.dates}
-          </p>
-        )}
       </div>
+      {/* エラー表示は overflow-y-auto コンテナの外側に置く（内側だと可視範囲外に出て気づけないため） */}
+      {errors.dates && (
+        <p className="text-sm text-red-500 mt-1 flex items-center gap-1.5" data-testid="date-error">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+          </svg>
+          {errors.dates}
+        </p>
+      )}
     </div>
 
     {/* カレンダーダイアログ */}
@@ -356,20 +372,21 @@ export const EventEditor = ({
             参加者が設定されていません。「追加」ボタンから参加者を追加してください。
           </div>
         )}
-        {errors.participants && (
-          <div 
-            role="alert"
-            data-testid="participant-error"
-            className="text-sm text-red-500 mt-1 flex items-center gap-1.5"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-            </svg>
-            {errors.participants}
-          </div>
-        )}
       </div>
-      
+      {/* エラー表示は overflow-y-auto コンテナの外側に置く（内側だと可視範囲外に出て気づけないため） */}
+      {errors.participants && (
+        <div
+          role="alert"
+          data-testid="participant-error"
+          className="text-sm text-red-500 mt-1 flex items-center gap-1.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+          </svg>
+          {errors.participants}
+        </div>
+      )}
+
       {participants.length > 0 && (
         <div className="flex justify-between items-center text-sm text-gray-500 px-2">
           <span>現在の参加者数: {participants.length}名</span>
